@@ -8,6 +8,13 @@ node_modules/
 .env.development.local
 .env.production.local
 
+# Screenshots & Media
+*.png
+*.jpg
+*.jpeg
+*.webp
+Screenshot*.png
+
 # Build & Cache Outputs
 .next/
 dist/
