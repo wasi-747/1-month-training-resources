@@ -42,6 +42,8 @@ Welcome to my 1-Month Web Development Training repository! This repository track
 .
 ├── README.md
 ├── .gitignore
+├── Resources/
+│   └── README.md
 ├── Week-1-Web-Foundations-and-JS/
 │   ├── Day-01-Web-Design-Git-JS-Basics/
 │   ├── Day-02-Advanced-JS-and-Async/
@@ -52,3 +54,9 @@ Welcome to my 1-Month Web Development Training repository! This repository track
 ├── Week-3-Node-Express-MongoDB/
 └── Week-4-NextJS-FullStack/
 ```
+
+---
+
+## 📚 [Curated Learning Resources Directory](./Resources/)
+Check out the full list of official documentation, guides, courses, and tutorials for React, Next.js, Node.js, MongoDB, Mongoose, Tailwind CSS, Eloquent JS, and Git workflows in the [`/Resources`](./Resources/) folder.
+
