@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GitHub Developer Explorer & Repository Analytics Dashboard built with vanilla JavaScript, ES6 Classes, Closures, and Async Fetch API.">
+  <title>GitHub Developer Explorer — Advanced JS Dashboard</title>
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Decorative Glow Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <!-- Header Banner & Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo">
+        <i class="fa-brands fa-github logo-icon"></i>
+        <div class="logo-text">
+          <h1>DevExplorer <span>JS</span></h1>
+          <p class="subtitle">Day 2 Practice Project — Advanced JS & Async Architecture</p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <span class="badge badge-pulse"><i class="fa-solid fa-bolt"></i> ES6+ Async</span>
+        <span class="badge badge-purple"><i class="fa-solid fa-box-archive"></i> Map Cache</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Area -->
+  <main id="main-content" class="main-container">
+
+    <!-- Search Section -->
+    <section class="search-section" aria-label="Search Developer Profile">
+      <form id="search-form" class="search-form">
+        <div class="input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input 
+            type="text" 
+            id="username-input" 
+            placeholder="Enter GitHub username (e.g., torvalds, gaearon, wasi-747)..." 
+            autocomplete="off"
+            required
+          >
+          <button type="submit" id="search-btn" class="btn btn-primary">
+            <span>Search</span>
+            <i class="fa-solid fa-arrow-right btn-icon"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Suggested Profiles -->
+      <div class="quick-tags">
+        <span class="quick-label">Try searching:</span>
+        <button type="button" class="tag-btn" data-user="gaearon">gaearon (Dan)</button>
+        <button type="button" class="tag-btn" data-user="yyx99">yyx99 (Evan)</button>
+        <button type="button" class="tag-btn" data-user="torvalds">torvalds (Linus)</button>
+        <button type="button" class="tag-btn" data-user="wasi-747">wasi-747</button>
+      </div>
+    </section>
+
+    <!-- Error / Toast Feedback Banner -->
+    <div id="feedback-banner" class="feedback-banner hidden" role="alert">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="feedback-message">User not found. Please try another username.</span>
+    </div>
+
+    <!-- Dashboard Content Layout (Profile + Repositories) -->
+    <div id="dashboard-view" class="dashboard-grid hidden">
+      
+      <!-- Left Column: User Profile Card -->
+      <aside class="profile-sidebar">
+        <article class="glass-card profile-card">
+          <div class="avatar-wrapper">
+            <img id="user-avatar" src="" alt="Developer Avatar" class="profile-avatar">
+            <span id="cache-badge" class="cache-indicator hidden" title="Loaded from ES6 Map Cache">
+              <i class="fa-solid fa-memory"></i> Cached
+            </span>
+          </div>
+
+          <h2 id="user-name" class="user-name">Developer Name</h2>
+          <p id="user-handle" class="user-handle">@username</p>
+          <p id="user-bio" class="user-bio">Bio description will appear here...</p>
+
+          <div class="user-meta">
+            <div class="meta-item">
+              <i class="fa-solid fa-location-dot"></i>
+              <span id="user-location">Location</span>
+            </div>
+            <div class="meta-item">
+              <i class="fa-solid fa-building"></i>
+              <span id="user-company">Company</span>
+            </div>
+            <div class="meta-item">
+              <i class="fa-solid fa-link"></i>
+              <a id="user-blog" href="#" target="_blank" rel="noopener">Website</a>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-box">
+              <span id="stat-repos" class="stat-num">0</span>
+              <span class="stat-label">Repos</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-followers" class="stat-num">0</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-following" class="stat-num">0</span>
+              <span class="stat-label">Following</span>
+            </div>
+          </div>
+
+          <a id="profile-github-link" href="#" target="_blank" class="btn btn-secondary full-width">
+            <span>View GitHub Profile</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </article>
+      </aside>
+
+      <!-- Right Column: Repository Analytics & List -->
+      <section class="repos-content">
+        
+        <!-- Summary Stats Banner (computed via .reduce()) -->
+        <div class="glass-card analytics-bar">
+          <div class="metric-card">
+            <i class="fa-solid fa-star metric-icon yellow"></i>
+            <div>
+              <h3 id="metric-total-stars">0</h3>
+              <p>Total Stars (Array.reduce)</p>
+            </div>
+          </div>
+          <div class="metric-card">
+            <i class="fa-solid fa-code-fork metric-icon blue"></i>
+            <div>
+              <h3 id="metric-total-forks">0</h3>
+              <p>Total Forks</p>
+            </div>
+          </div>
+          <div class="metric-card">
+            <i class="fa-solid fa-code metric-icon green"></i>
+            <div>
+              <h3 id="metric-top-lang">JavaScript</h3>
+              <p>Top Language</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filter-toolbar">
+          <h3>Public Repositories</h3>
+          <div class="filter-actions">
+            <select id="lang-filter" class="custom-select">
+              <option value="all">All Languages</option>
+            </select>
+            <select id="sort-select" class="custom-select">
+              <option value="stars">Sort by Stars</option>
+              <option value="updated">Sort by Updated</option>
+              <option value="name">Sort by Name</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Repository Cards Grid -->
+        <div id="repos-container" class="repos-grid">
+          <!-- Rendered dynamically via JS -->
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Initial Welcome State -->
+    <div id="welcome-state" class="glass-card welcome-card">
+      <div class="welcome-icon-box">
+        <i class="fa-solid fa-laptop-code"></i>
+      </div>
+      <h2>Search Any GitHub Developer</h2>
+      <p>This application demonstrates <strong>Promise.all()</strong> parallel fetching, <strong>ES6 Class Private Caching (`#searchCache`)</strong>, closures, and <strong>Array methods (`map`, `filter`, `reduce`)</strong>.</p>
+    </div>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Built for 1-Month Web Development Internship • Week 1 Day 2 Practice Mini-Project</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

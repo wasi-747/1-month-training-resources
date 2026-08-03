@@ -31,12 +31,11 @@
 ## 🏁 End of Day (EOD) Update — Monday (Week 1, Day 2)
 
 - ✅ **Accomplished Today:**
-  - Completed comprehensive study and code practice on Advanced JavaScript & Asynchronous Architecture.
+  - Completed study and code practice on Advanced JavaScript & Asynchronous Architecture.
   - Practiced Scopes & Closures (Private State & Currying), `this` Binding (`call`/`apply`/`bind`), and ES6 Classes with `#privateField` encapsulation.
-  - Analyzed the JavaScript Event Loop concurrency model: Call Stack, Web APIs, Microtask Queue (`Promise.then`, `queueMicrotask`), and Macrotask Queue (`setTimeout`).
-  - Implemented and verified Promise Combinators (`Promise.all`, `Promise.allSettled`) to eliminate async bottlenecks.
-  - Organized Curated Learning Resources directory (`/Resources/README.md`) and Intern Work Ethics Guidelines (`/Resources/work-ethics-for-interns.md`).
-  - Pushed all Day 2 notes, code practice suite, and resources documentation to GitHub.
+  - Explored the JavaScript Event Loop concurrency model: Call Stack, Web APIs, Microtasks (`Promise.then`), and Macrotasks (`setTimeout`).
+  - **Built Practice Mini-Project**: Created **DevExplorer JS** (`/mini-project/`), a GitHub Developer & Repository Dashboard combining HTML5/CSS Glassmorphism with `Promise.all()` parallel fetching, ES6 `#private` Map caching, Closures, and `.reduce()` analytics.
+  - Organized Curated Learning Resources directory (`/Resources/README.md`), Work Ethics Guidelines (`/Resources/work-ethics-for-interns.md`), and Monday Presentation Guidelines (`/Resources/monday-presentation-guidelines.md`).
 
 - 🔗 **GitHub Repository:** https://github.com/wasi-747/1-month-training-resources
 

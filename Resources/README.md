@@ -5,14 +5,20 @@ This directory contains a curated list of essential reference guides, official d
 ---
 
 ## 🗂️ Table of Contents
-1. [📋 Work Ethics & Guidelines for Interns](./work-ethics-for-interns.md)
-2. [⚛️ React & Frontend Architecture](#️-react--frontend-architecture)
-3. [📱 Mobile Development (React Native)](#-mobile-development-react-native)
-4. [🍃 Backend & Databases (Node.js, MongoDB & Mongoose)](#-backend--databases-nodejs-mongodb--mongoose)
-5. [🌐 Full-Stack & SSR Frameworks (Next.js)](#-full-stack--ssr-frameworks-nextjs)
-6. [🟨 JavaScript Deep Dive (Eloquent JS)](#-javascript-deep-dive-eloquent-js)
-7. [🎨 HTML, CSS & Modern Web Design](#-html-css--modern-web-design)
-8. [🔀 Version Control & GitHub Team Workflows](#-version-control--github-team-workflows)
+1. [🎤 Monday Presentation & Live Demo Guidelines](./monday-presentation-guidelines.md)
+2. [📋 Work Ethics & Guidelines for Interns](./work-ethics-for-interns.md)
+3. [⚛️ React & Frontend Architecture](#️-react--frontend-architecture)
+4. [📱 Mobile Development (React Native)](#-mobile-development-react-native)
+5. [🍃 Backend & Databases (Node.js, MongoDB & Mongoose)](#-backend--databases-nodejs-mongodb--mongoose)
+6. [🌐 Full-Stack & SSR Frameworks (Next.js)](#-full-stack--ssr-frameworks-nextjs)
+7. [🟨 JavaScript Deep Dive (Eloquent JS)](#-javascript-deep-dive-eloquent-js)
+8. [🎨 HTML, CSS & Modern Web Design](#-html-css--modern-web-design)
+9. [🔀 Version Control & GitHub Team Workflows](#-version-control--github-team-workflows)
+
+---
+
+## 🎤 Monday Presentation & Live Demo Guidelines
+* **[Monday Presentation Guidelines Document](./monday-presentation-guidelines.md)** — Core structure and guidelines for weekly Monday presentations covering What You Learned, Challenges, Solutions, Live Demo, Key Lessons, and Next Week Goals.
 
 ---
 
