@@ -2,7 +2,7 @@
 
 ## 📋 TODO List — Monday (Week 1, Day 2)
 1. 📖 Study Advanced JavaScript Concepts (Scopes, Lexical Environment, Closures & Private State).
-2. 📖 Master the `this` keyword & explicit context binding (`call`, `apply`, `bind`, Arrow function `this`).
+2. 📖 Learn the `this` keyword & explicit context binding (`call`, `apply`, `bind`, Arrow function `this`).
 3. 📖 Study JavaScript Prototypes, Prototype Chain & ES6 Class inheritance (`extends`, `super`, `#privateField`).
 4. ⚡ Deep dive into the JavaScript Event Loop, Call Stack, Microtasks (Promises) & Macrotasks (`setTimeout`).
 5. 🌐 Practice Asynchronous JavaScript & Promise Combinators (`Promise.all`, `Promise.allSettled`, `Promise.race`, `Promise.any`).
@@ -15,7 +15,7 @@
 
 - ✅ **Completed:**
   - Deep-dived into Advanced JavaScript Scope & Lexical Environments: Scope Chain, Closures, Data Encapsulation, and Function Factories (Currying).
-  - Mastered `this` keyword binding rules: Implicit vs Explicit binding (`call`, `apply`, `bind`) and lexical `this` behavior in Arrow functions.
+  - Studied `this` keyword binding rules: Implicit vs Explicit binding (`call`, `apply`, `bind`) and lexical `this` behavior in Arrow functions.
   - Explored Object-Oriented JS: Prototypal inheritance, ES6 Class syntax, `static` methods, and ES2022 private fields (`#privateField`).
   - Executed and validated runnable code snippets in Node.js for Scopes, `this` binding, and Class inheritance.
 
@@ -32,7 +32,7 @@
 
 - ✅ **Accomplished Today:**
   - Completed comprehensive study and code practice on Advanced JavaScript & Asynchronous Architecture.
-  - Mastered Scopes & Closures (Private State & Currying), `this` Binding (`call`/`apply`/`bind`), and ES6 Classes with `#privateField` encapsulation.
+  - Practiced Scopes & Closures (Private State & Currying), `this` Binding (`call`/`apply`/`bind`), and ES6 Classes with `#privateField` encapsulation.
   - Analyzed the JavaScript Event Loop concurrency model: Call Stack, Web APIs, Microtask Queue (`Promise.then`, `queueMicrotask`), and Macrotask Queue (`setTimeout`).
   - Implemented and verified Promise Combinators (`Promise.all`, `Promise.allSettled`) to eliminate async bottlenecks.
   - Organized Curated Learning Resources directory (`/Resources/README.md`) and Intern Work Ethics Guidelines (`/Resources/work-ethics-for-interns.md`).

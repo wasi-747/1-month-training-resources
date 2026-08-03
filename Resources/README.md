@@ -10,7 +10,7 @@ This directory contains a curated list of essential reference guides, official d
 3. [📱 Mobile Development (React Native)](#-mobile-development-react-native)
 4. [🍃 Backend & Databases (Node.js, MongoDB & Mongoose)](#-backend--databases-nodejs-mongodb--mongoose)
 5. [🌐 Full-Stack & SSR Frameworks (Next.js)](#-full-stack--ssr-frameworks-nextjs)
-6. [🟨 JavaScript Mastery (Eloquent JS)](#-javascript-mastery-eloquent-js)
+6. [🟨 JavaScript Deep Dive (Eloquent JS)](#-javascript-deep-dive-eloquent-js)
 7. [🎨 HTML, CSS & Modern Web Design](#-html-css--modern-web-design)
 8. [🔀 Version Control & GitHub Team Workflows](#-version-control--github-team-workflows)
 
@@ -19,7 +19,6 @@ This directory contains a curated list of essential reference guides, official d
 ## 📋 Work Ethics & Guidelines for Interns
 * **[Work Ethics & Guidelines Document](./work-ethics-for-interns.md)** — Comprehensive guide covering professional behavior, task ownership, meeting etiquette, bug disclosure, coding standards, Git commit & AI usage rules, attendance, and data security.
 
-
 ---
 
 ## ⚛️ React & Frontend Architecture
@@ -27,7 +26,7 @@ This directory contains a curated list of essential reference guides, official d
 React is a declarative, efficient, and flexible JavaScript library for building user interfaces.
 
 ### 📖 Official Documentation & Core Concepts
-* **[Official React Documentation](https://react.dev/learn)** — Comprehensive guide for understanding and mastering fundamental principles.
+* **[Official React Documentation](https://react.dev/learn)** — Comprehensive guide for understanding and practicing fundamental principles.
 * **[Thinking in React](https://react.dev/learn/thinking-in-react)** — *(Crucial Guide)* Step-by-step approach to breaking UI designs into component hierarchies and state structures.
 * **[Describing the UI](https://react.dev/learn/describing-the-ui)** — JSX syntax, components, props, and conditional rendering.
 * **[Adding Interactivity](https://react.dev/learn/adding-interactivity)** — Event handling, component state, snapshot updates, and queueing.
@@ -81,7 +80,7 @@ Next.js is a premier production React framework enabling hybrid rendering strate
 
 ---
 
-## 🟨 JavaScript Mastery (Eloquent JS)
+## 🟨 JavaScript Deep Dive (Eloquent JS)
 
 * **[Eloquent JavaScript (Free Book)](https://eloquentjavascript.net/)**
   - Essential reading for deepening core JS mechanics.
