@@ -4,10 +4,10 @@
 1. 📖 Study Advanced JavaScript Concepts (Scopes, Lexical Environment, Closures & Private State).
 2. 📖 Learn the `this` keyword & explicit context binding (`call`, `apply`, `bind`, Arrow function `this`).
 3. 📖 Study JavaScript Prototypes, Prototype Chain & ES6 Class inheritance (`extends`, `super`, `#privateField`).
-4. ⚡ Deep dive into the JavaScript Event Loop, Call Stack, Microtasks (Promises) & Macrotasks (`setTimeout`).
-5. 🌐 Practice Asynchronous JavaScript & Promise Combinators (`Promise.all`, `Promise.allSettled`, `Promise.race`, `Promise.any`).
-6. 💻 Write and execute comprehensive JS practice snippets covering closures, classes, async execution, `structuredClone`, `Map`, and `Set`.
-7. 📄 Organize curated learning resources & work ethics guidelines into repository documentation.
+4. ⚡ Explore the JavaScript Event Loop, Call Stack, Microtasks (Promises) & Macrotasks (`setTimeout`).
+5. 🌐 Practice Asynchronous JavaScript & Promise Combinators (`Promise.all`, `Promise.allSettled`).
+6. 💻 Build a small practice mini-project combining Day 1 & Day 2 concepts (Async data fetching + ES6 Class/Closure state).
+7. 📄 Organize learning resources, review work ethics guidelines, and prepare notes for Next Monday's Presentation #1.
 
 ---
 
