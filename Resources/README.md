@@ -5,13 +5,20 @@ This directory contains a curated list of essential reference guides, official d
 ---
 
 ## 🗂️ Table of Contents
-1. [⚛️ React & Frontend Architecture](#️-react--frontend-architecture)
-2. [📱 Mobile Development (React Native)](#-mobile-development-react-native)
-3. [🍃 Backend & Databases (Node.js, MongoDB & Mongoose)](#-backend--databases-nodejs-mongodb--mongoose)
-4. [🌐 Full-Stack & SSR Frameworks (Next.js)](#-full-stack--ssr-frameworks-nextjs)
-5. [🟨 JavaScript Mastery (Eloquent JS)](#-javascript-mastery-eloquent-js)
-6. [🎨 HTML, CSS & Modern Web Design](#-html-css--modern-web-design)
-7. [🔀 Version Control & GitHub Team Workflows](#-version-control--github-team-workflows)
+1. [📋 Work Ethics & Guidelines for Interns](./work-ethics-for-interns.md)
+2. [⚛️ React & Frontend Architecture](#️-react--frontend-architecture)
+3. [📱 Mobile Development (React Native)](#-mobile-development-react-native)
+4. [🍃 Backend & Databases (Node.js, MongoDB & Mongoose)](#-backend--databases-nodejs-mongodb--mongoose)
+5. [🌐 Full-Stack & SSR Frameworks (Next.js)](#-full-stack--ssr-frameworks-nextjs)
+6. [🟨 JavaScript Mastery (Eloquent JS)](#-javascript-mastery-eloquent-js)
+7. [🎨 HTML, CSS & Modern Web Design](#-html-css--modern-web-design)
+8. [🔀 Version Control & GitHub Team Workflows](#-version-control--github-team-workflows)
+
+---
+
+## 📋 Work Ethics & Guidelines for Interns
+* **[Work Ethics & Guidelines Document](./work-ethics-for-interns.md)** — Comprehensive guide covering professional behavior, task ownership, meeting etiquette, bug disclosure, coding standards, Git commit & AI usage rules, attendance, and data security.
+
 
 ---
 
