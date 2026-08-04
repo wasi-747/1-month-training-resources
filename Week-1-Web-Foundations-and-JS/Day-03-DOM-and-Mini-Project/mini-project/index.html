@@ -3,92 +3,244 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub User Explorer & Bookmark Manager</title>
-  <link rel="stylesheet" href="styles.css">
-  <!-- Google Fonts -->
+  <meta name="description" content="DevExplorer Pro v2.0 — Ultimate GitHub Developer Analytics, Repository Explorer & Bookmark Manager built with Vanilla JS, Event Delegation, Async API & LocalStorage.">
+  <title>DevExplorer Pro v2.0 — GitHub Analytics & Bookmark Manager</title>
+
+  <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-container">
-        <div class="logo-icon">🐙</div>
-        <div>
-          <h1>GitExplorer <span class="badge">v1.0</span></h1>
-          <p class="subtitle">Search GitHub users, explore repositories, and save your favorite bookmarks</p>
+
+  <!-- Background Decorative Ambient Glow Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo">
+        <i class="fa-brands fa-github logo-icon"></i>
+        <div class="logo-text">
+          <h1>DevExplorer <span class="badge-pro">PRO v2.0</span></h1>
+          <p class="subtitle">Day 3 Master Project — Event Architecture, Async Analytics & LocalStorage</p>
         </div>
       </div>
-    </header>
+      
+      <!-- Action Controls & Navigation Tabs -->
+      <div class="header-actions">
+        <div class="nav-tabs" role="tablist">
+          <button id="tab-explorer" class="tab-btn active" data-tab="explorer">
+            <i class="fa-solid fa-compass"></i> Explorer
+          </button>
+          <button id="tab-bookmarks" class="tab-btn" data-tab="bookmarks">
+            <i class="fa-solid fa-bookmark text-amber"></i> Bookmarks
+            <span id="bookmark-badge-count" class="badge-count">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-    <!-- Search & Filter Controls -->
-    <section class="search-section">
+  <!-- Main Application Container -->
+  <main id="main-content" class="main-container">
+
+    <!-- Search Section -->
+    <section class="search-section" aria-label="Search Developer Profile">
       <form id="search-form" class="search-form">
-        <div class="input-group">
-          <span class="search-icon">🔍</span>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
           <input 
             type="text" 
-            id="search-input" 
-            placeholder="Type a GitHub username (e.g. wasi-747, octocat, torvalds)..." 
+            id="username-input" 
+            placeholder="Search GitHub developer (e.g. wasi-747, torvalds, gaearon, yyx99)..." 
             autocomplete="off"
             required
-          />
-          <button type="submit" class="btn-search">Search</button>
+          >
+          <button type="submit" id="search-btn" class="btn btn-primary">
+            <span>Search</span>
+            <i class="fa-solid fa-arrow-right btn-icon"></i>
+          </button>
         </div>
       </form>
 
-      <!-- View Filter Tabs -->
-      <div class="filter-tabs">
-        <button id="tab-search" class="tab-btn active" data-view="search">🔍 Search Results</button>
-        <button id="tab-bookmarks" class="tab-btn" data-view="bookmarks">
-          ⭐ Bookmarks <span id="bookmark-count" class="count-badge">0</span>
-        </button>
+      <!-- Quick Suggested Tags (Delegated Event Listeners) -->
+      <div class="quick-tags" id="quick-tags-container">
+        <span class="quick-label">Popular Developers:</span>
+        <button type="button" class="tag-btn" data-user="wasi-747"><i class="fa-solid fa-user-astronaut"></i> wasi-747</button>
+        <button type="button" class="tag-btn" data-user="gaearon"><i class="fa-brands fa-react text-blue"></i> gaearon (Dan)</button>
+        <button type="button" class="tag-btn" data-user="yyx99"><i class="fa-brands fa-vuejs text-green"></i> yyx99 (Evan)</button>
+        <button type="button" class="tag-btn" data-user="torvalds"><i class="fa-brands fa-linux text-yellow"></i> torvalds (Linus)</button>
       </div>
     </section>
 
-    <!-- Main Dynamic Content Area -->
-    <main class="content-area">
-      <!-- Loading State -->
-      <div id="loading-state" class="state-container hidden">
-        <div class="spinner"></div>
-        <p>Fetching developer profile from GitHub...</p>
-      </div>
+    <!-- Error / Alert Banner -->
+    <div id="feedback-banner" class="feedback-banner hidden" role="alert">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="feedback-message">User not found. Please try another username.</span>
+    </div>
 
-      <!-- Error / Empty State -->
-      <div id="error-state" class="state-container hidden">
-        <div class="error-icon">⚠️</div>
-        <h3 id="error-title">User Not Found</h3>
-        <p id="error-message">Could not find a GitHub profile matching that username.</p>
-      </div>
+    <!-- VIEW 1: EXPLORER DASHBOARD VIEW -->
+    <div id="explorer-view" class="dashboard-grid">
+      
+      <!-- Left Sidebar: Profile Card & Quick Bookmark Toggle -->
+      <aside class="profile-sidebar">
+        <article class="glass-card profile-card" id="profile-card-element">
+          <div class="avatar-wrapper">
+            <img id="user-avatar" src="https://github.com/github.png" alt="Developer Avatar" class="profile-avatar">
+            <span id="cache-badge" class="cache-indicator hidden" title="Loaded from ES6 Memory Cache">
+              <i class="fa-solid fa-memory"></i> Cached
+            </span>
+          </div>
 
-      <!-- Initial Welcome State -->
-      <div id="welcome-state" class="state-container">
-        <div class="welcome-icon">🚀</div>
-        <h3>Explore GitHub Developers</h3>
-        <p>Type any username above to view detailed statistics, repositories, and save bookmarks.</p>
-        <div class="quick-suggestions">
-          <span>Try searching:</span>
-          <button class="suggestion-chip" data-user="wasi-747">wasi-747</button>
-          <button class="suggestion-chip" data-user="octocat">octocat</button>
-          <button class="suggestion-chip" data-user="torvalds">torvalds</button>
-          <button class="suggestion-chip" data-user="gaearon">gaearon</button>
+          <div class="profile-header-meta">
+            <h2 id="user-name" class="user-name">Developer Name</h2>
+            <p id="user-handle" class="user-handle">@username</p>
+          </div>
+
+          <!-- Bookmark Toggle Action Button -->
+          <button id="btn-toggle-bookmark" class="btn btn-bookmark full-width" data-action="toggle-bookmark">
+            <i class="fa-regular fa-star"></i>
+            <span>Save to Bookmarks</span>
+          </button>
+
+          <p id="user-bio" class="user-bio">Search for a developer above to inspect detailed repositories, total star analytics, and save profiles.</p>
+
+          <div class="user-meta">
+            <div class="meta-item">
+              <i class="fa-solid fa-location-dot"></i>
+              <span id="user-location">Location</span>
+            </div>
+            <div class="meta-item">
+              <i class="fa-solid fa-building"></i>
+              <span id="user-company">Company</span>
+            </div>
+            <div class="meta-item">
+              <i class="fa-solid fa-link"></i>
+              <a id="user-blog" href="#" target="_blank" rel="noopener">Website</a>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-box">
+              <span id="stat-repos" class="stat-num">0</span>
+              <span class="stat-label">Repos</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-followers" class="stat-num">0</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-following" class="stat-num">0</span>
+              <span class="stat-label">Following</span>
+            </div>
+          </div>
+
+          <a id="profile-github-link" href="#" target="_blank" class="btn btn-secondary full-width">
+            <span>View GitHub Profile</span>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </article>
+      </aside>
+
+      <!-- Right Main Content: Analytics & Repositories -->
+      <section class="repos-content">
+        
+        <!-- Summary Analytics Bar (.reduce() computed) -->
+        <div class="glass-card analytics-bar">
+          <div class="metric-card">
+            <i class="fa-solid fa-star metric-icon yellow"></i>
+            <div>
+              <h3 id="metric-total-stars">0</h3>
+              <p>Total Stars Received</p>
+            </div>
+          </div>
+          <div class="metric-card">
+            <i class="fa-solid fa-code-fork metric-icon blue"></i>
+            <div>
+              <h3 id="metric-total-forks">0</h3>
+              <p>Total Repository Forks</p>
+            </div>
+          </div>
+          <div class="metric-card">
+            <i class="fa-solid fa-code metric-icon green"></i>
+            <div>
+              <h3 id="metric-top-lang">JavaScript</h3>
+              <p>Primary Language</p>
+            </div>
+          </div>
         </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-toolbar glass-card">
+          <div class="toolbar-search">
+            <i class="fa-solid fa-filter"></i>
+            <input type="text" id="repo-filter-input" placeholder="Filter repositories by name..." autocomplete="off">
+          </div>
+          <div class="filter-actions">
+            <select id="lang-filter" class="custom-select">
+              <option value="all">All Languages</option>
+            </select>
+            <select id="sort-select" class="custom-select">
+              <option value="stars">Sort by Stars ⭐</option>
+              <option value="updated">Sort by Updated 🕒</option>
+              <option value="name">Sort by Name 🔤</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Repositories Grid Container (Delegated Event Container) -->
+        <div id="repos-container" class="repos-grid">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- VIEW 2: BOOKMARKS MANAGEMENT VIEW -->
+    <section id="bookmarks-view" class="bookmarks-section hidden">
+      <div class="bookmarks-header glass-card">
+        <div>
+          <h2><i class="fa-solid fa-star text-amber"></i> Saved Developer Bookmarks</h2>
+          <p class="subtitle">Profiles and repositories persisted in client-side LocalStorage</p>
+        </div>
+        <button id="btn-clear-bookmarks" class="btn btn-outline-danger">
+          <i class="fa-solid fa-trash-can"></i> Clear All Bookmarks
+        </button>
       </div>
 
-      <!-- Results Grid Container -->
-      <div id="results-container" class="results-grid hidden"></div>
+      <!-- Bookmarks Cards Grid (Delegated Event Container) -->
+      <div id="bookmarks-grid" class="bookmarks-grid">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
 
-      <!-- Bookmarks Grid Container -->
-      <div id="bookmarks-container" class="results-grid hidden"></div>
-    </main>
+    <!-- Initial Welcome State -->
+    <div id="welcome-state" class="glass-card welcome-card">
+      <div class="welcome-icon-box">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <h2>DevExplorer Pro v2.0</h2>
+      <p>Search any GitHub developer to inspect <strong>Promise.all() parallel analytics</strong>, <strong>event delegation architecture</strong>, live repository filtering, and <strong>LocalStorage bookmarking</strong>.</p>
+    </div>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-      <p>Built with Vanilla JS, Async/Await REST API & LocalStorage | 1-Month Training Roadmap</p>
-    </footer>
-  </div>
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <p>DevExplorer Pro v2.0 • Built with Vanilla JS ES6+, Event Architecture & LocalStorage • 1-Month Training Roadmap</p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
