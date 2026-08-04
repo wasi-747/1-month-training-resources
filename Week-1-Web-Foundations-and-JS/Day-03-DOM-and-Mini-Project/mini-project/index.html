@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub User Explorer & Bookmark Manager</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-container">
+        <div class="logo-icon">🐙</div>
+        <div>
+          <h1>GitExplorer <span class="badge">v1.0</span></h1>
+          <p class="subtitle">Search GitHub users, explore repositories, and save your favorite bookmarks</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search & Filter Controls -->
+    <section class="search-section">
+      <form id="search-form" class="search-form">
+        <div class="input-group">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Type a GitHub username (e.g. wasi-747, octocat, torvalds)..." 
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="btn-search">Search</button>
+        </div>
+      </form>
+
+      <!-- View Filter Tabs -->
+      <div class="filter-tabs">
+        <button id="tab-search" class="tab-btn active" data-view="search">🔍 Search Results</button>
+        <button id="tab-bookmarks" class="tab-btn" data-view="bookmarks">
+          ⭐ Bookmarks <span id="bookmark-count" class="count-badge">0</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Dynamic Content Area -->
+    <main class="content-area">
+      <!-- Loading State -->
+      <div id="loading-state" class="state-container hidden">
+        <div class="spinner"></div>
+        <p>Fetching developer profile from GitHub...</p>
+      </div>
+
+      <!-- Error / Empty State -->
+      <div id="error-state" class="state-container hidden">
+        <div class="error-icon">⚠️</div>
+        <h3 id="error-title">User Not Found</h3>
+        <p id="error-message">Could not find a GitHub profile matching that username.</p>
+      </div>
+
+      <!-- Initial Welcome State -->
+      <div id="welcome-state" class="state-container">
+        <div class="welcome-icon">🚀</div>
+        <h3>Explore GitHub Developers</h3>
+        <p>Type any username above to view detailed statistics, repositories, and save bookmarks.</p>
+        <div class="quick-suggestions">
+          <span>Try searching:</span>
+          <button class="suggestion-chip" data-user="wasi-747">wasi-747</button>
+          <button class="suggestion-chip" data-user="octocat">octocat</button>
+          <button class="suggestion-chip" data-user="torvalds">torvalds</button>
+          <button class="suggestion-chip" data-user="gaearon">gaearon</button>
+        </div>
+      </div>
+
+      <!-- Results Grid Container -->
+      <div id="results-container" class="results-grid hidden"></div>
+
+      <!-- Bookmarks Grid Container -->
+      <div id="bookmarks-container" class="results-grid hidden"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Built with Vanilla JS, Async/Await REST API & LocalStorage | 1-Month Training Roadmap</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
