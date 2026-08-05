@@ -22,3 +22,22 @@
   - Exploring Node.js built-in `http` module for creating basic server-side REST API endpoints.
 
 - ⚠️ **Issues / Blockers:** None. All Node.js scripts executing cleanly.
+
+---
+
+## 🏁 End of Day (EOD) Update — Wednesday (Week 1, Day 4)
+
+- ✅ **Accomplished Today:**
+  - Studied Node.js core architecture, event loop concurrency model, and process management.
+  - Learned asynchronous File System operations (`fs.promises`, `readFile`, `writeFile`, `appendFile`).
+  - Built command-line practice scripts for automated file parsing and JSON logging.
+  - Explored basic HTTP server setup and RESTful API endpoints in Node.js.
+  - Pushed Day 4 study notes, practice code, and daily logs to GitHub.
+
+- 🔗 **GitHub Repository:** https://github.com/wasi-747/1-month-training-resources
+
+- 📝 **Key Learnings:** Asynchronous non-blocking file I/O operations, Node.js module exports/imports, and basic HTTP request handling.
+
+- ❓ **Open Issues / Blockers:** None. All snippets tested and verified clean with `node`.
+
+- 🎯 **Next Focus (Sunday - Week 1, Day 5):** Review Week 1 topics, perform codebase polish, and finalize slides for Monday's Presentation #1.
