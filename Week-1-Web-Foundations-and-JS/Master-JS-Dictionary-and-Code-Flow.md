@@ -1,4 +1,5 @@
-# 📖 Master JavaScript, DOM & Node.js Technical Dictionary & Call Flow Guide
+# 📖 Master Full-Stack Engineering Dictionary & Call Flow Guide
+### (JavaScript, DOM, Node.js, Git & GitHub Complete Master Reference)
 
 **Author:** Full-Stack Engineering Trainee  
 **Track:** 1-Month Web Development Training (Week 1 Master Reference)  
@@ -6,18 +7,83 @@
 ---
 
 ## 📚 Table of Contents
-1. [Variables, Scope & Memory](#1-variables-scope--memory)
-2. [Operators & Logical Expressions](#2-operators--logical-expressions)
-3. [Functions, Execution Context & Closures](#3-functions-execution-context--closures)
-4. [Data Structures & Higher-Order Array Methods](#4-data-structures--higher-order-array-methods)
-5. [Asynchronous JavaScript & Event Loop Engine](#5-asynchronous-javascript--event-loop-engine)
-6. [DOM Event Architecture & Browser Storage](#6-dom-event-architecture--browser-storage)
-7. [Node.js Core Runtime & File System (fs)](#7-nodejs-core-runtime--file-system-fs)
-8. [Real Code Line-by-Line Execution & Call Flow Breakdown](#8-real-code-line-by-line-execution--call-flow-breakdown)
+1. [Git & GitHub Professional Architecture & Commands](#1-git--github-professional-architecture--commands)
+2. [Variables, Scope & Memory](#2-variables-scope--memory)
+3. [Operators & Logical Expressions](#3-operators--logical-expressions)
+4. [Functions, Execution Context & Closures](#4-functions-execution-context--closures)
+5. [Data Structures & Higher-Order Array Methods](#5-data-structures--higher-order-array-methods)
+6. [Asynchronous JavaScript & Event Loop Engine](#6-asynchronous-javascript--event-loop-engine)
+7. [DOM Event Architecture & Browser Storage](#7-dom-event-architecture--browser-storage)
+8. [Node.js Core Runtime & File System (fs)](#8-nodejs-core-runtime--file-system-fs)
+9. [Real Code & Git Line-by-Line Execution & Call Flow Breakdown](#9-real-code--git-line-by-line-execution--call-flow-breakdown)
 
 ---
 
-## 1. Variables, Scope & Memory
+## 1. Git & GitHub Professional Architecture & Commands
+
+### A. Core Concepts & States
+| Term / Concept | Identity | Purpose & Underlying Mechanism |
+| :--- | :--- | :--- |
+| **Git** | Tool | Local distributed Version Control System (VCS) tracking code change history on your computer. |
+| **GitHub** | Cloud Platform | Cloud hosting service for Git repositories facilitating team collaboration, PRs, and CI/CD. |
+| **Working Directory** | Local State | Where you actively create and edit files before staging them. |
+| **Staging Area (Index)** | Local State | The intermediate preparation zone where changes are marked to be included in the next commit. |
+| **Local Repository** | Local State | The `.git` directory storing committed history snapshots permanently on your local disk. |
+| **Remote Repository (`origin`)** | Cloud State | The central GitHub-hosted repository shared across engineering teams. |
+| **`main` / `master`** | Branch | The default production branch representing live, deployable, stable code. |
+| **Feature Branch** | Branch | An isolated branch (`feature/task-name`) where new features are built without risking `main`. |
+| **Commit SHA / Hash** | Identifier | A unique 40-character cryptographic hash (e.g. `c840a8e`) identifying a specific commit snapshot. |
+| **`.gitignore`** | Config File | A text file listing files/folders Git must never track (e.g. `node_modules/`, `.env`, secrets). |
+
+---
+
+### B. Essential Git Commands Dictionary
+
+| Command | Category | Exact Action & What It Does |
+| :--- | :--- | :--- |
+| **`git init`** | Setup | Initializes a brand new empty Git repository in the current folder (creates `.git/`). |
+| **`git clone <url>`** | Setup | Downloads a complete remote repository and its full commit history to your computer. |
+| **`git status`** | Inspection | Shows modified, untracked, or staged files in your working tree. |
+| **`git add .`** / `git add <file>` | Staging | Moves modified files from Working Directory to the Staging Area. |
+| **`git commit -m "msg"`** | History | Saves a permanent snapshot of all staged files to local repository history. |
+| **`git branch`** | Branching | Lists all existing local branches (shows active branch with `*`). |
+| **`git checkout -b <name>`** | Branching | **Creates AND switches** to a new branch in a single command. |
+| **`git switch <name>`** | Branching | Switches between existing branches (e.g. `git switch main`). |
+| **`git remote add origin <url>`**| Remote | Links your local Git repository to a remote GitHub repository URL. |
+| **`git push -u origin <branch>`**| Remote | Uploads local commits to GitHub and sets up upstream tracking. |
+| **`git pull`** | Remote | Fetches updates from GitHub and immediately merges them into your active branch. |
+| **`git fetch`** | Remote | Downloads remote changes to your local tracking branch without modifying working files. |
+| **`git merge <branch>`** | Integration | Merges changes from the specified branch into your current active branch. |
+| **`git log --oneline`** | History | Displays a compact chronological list of past commit hashes and messages. |
+| **`git diff`** | Inspection | Shows line-by-line additions (`+`) and deletions (`-`) before staging. |
+| **`git reset <file>`** | Undo | Unstages a file while keeping your local code edits intact. |
+
+---
+
+### C. Conventional Commit Standards (Corporate Best Practice)
+
+| Prefix Tag | Meaning | Example |
+| :--- | :--- | :--- |
+| **`feat:`** | New functional feature added | `feat: add user bookmarking in localStorage` |
+| **`fix:`** | Bug patch / issue resolution | `fix: resolve flexbox navbar overlap on mobile` |
+| **`docs:`** | Documentation or README changes | `docs: add Day 1 study notes to README` |
+| **`style:`** | CSS styling or formatting | `style: update button background to indigo` |
+| **`refactor:`**| Code cleanup without feature change | `refactor: extract user card into modular component` |
+| **`test:`** | Adding or updating unit tests | `test: add Jest tests for tax calculator function` |
+| **`chore:`** | Maintenance or package updates | `chore: update dependencies in package.json` |
+
+---
+
+### D. GitHub Team Collaboration Concepts
+
+* **Pull Request (PR)**: A formal request asking team members to review code on a feature branch before merging into `main`.
+* **Code Review**: Senior engineers inspect lines changed in a PR, leaving comments, approvals, or change requests.
+* **Merge Conflict**: Occurs when two developers edit the exact same line in a file; resolved manually by choosing which lines to keep.
+* **GitHub Issues**: Task tracker tickets used to assign bugs, features, and milestones (`fixes #14` in commit automatically closes issue #14).
+
+---
+
+## 2. Variables, Scope & Memory
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -32,7 +98,7 @@
 
 ---
 
-## 2. Operators & Logical Expressions
+## 3. Operators & Logical Expressions
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -48,7 +114,7 @@
 
 ---
 
-## 3. Functions, Execution Context & Closures
+## 4. Functions, Execution Context & Closures
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -66,7 +132,7 @@
 
 ---
 
-## 4. Data Structures & Higher-Order Array Methods
+## 5. Data Structures & Higher-Order Array Methods
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -84,7 +150,7 @@
 
 ---
 
-## 5. Asynchronous JavaScript & Event Loop Engine
+## 6. Asynchronous JavaScript & Event Loop Engine
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -102,7 +168,7 @@
 
 ---
 
-## 6. DOM Event Architecture & Browser Storage
+## 7. DOM Event Architecture & Browser Storage
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -121,7 +187,7 @@
 
 ---
 
-## 7. Node.js Core Runtime & File System (fs)
+## 8. Node.js Core Runtime & File System (fs)
 
 | Term / Keyword | Identity | Purpose & Underlying Mechanism |
 | :--- | :--- | :--- |
@@ -138,9 +204,24 @@
 
 ---
 
-## 8. Real Code Line-by-Line Execution & Call Flow Breakdown
+## 9. Real Code & Git Line-by-Line Execution & Call Flow Breakdown
 
-### 💻 Walkthrough #1: DevExplorer Parallel API Fetcher (`app.js`)
+### 🔀 Git Lifecycle Walkthrough: How Code Moves to GitHub
+
+```
+[ Working Directory ] ──( git add . )──> [ Staging Area ] ──( git commit )──> [ Local Repo ] ──( git push )──> [ GitHub PR ] ──( Merge )──> [ main ]
+```
+
+1. **Step 1 (Branching)**: `git checkout -b feature/user-bookmarks` creates an isolated branch from `main`.
+2. **Step 2 (Modifying Code)**: Edit files in your editor (Working Directory). `git status` shows red modified files.
+3. **Step 3 (Staging)**: `git add .` stages all changed files into index preparation. `git status` shows green staged files.
+4. **Step 4 (Commit Snapshot)**: `git commit -m "feat: add user bookmarking"` creates a local immutable commit SHA snapshot.
+5. **Step 5 (Push to GitHub)**: `git push -u origin feature/user-bookmarks` uploads commits to GitHub remote.
+6. **Step 6 (Pull Request & Merge)**: Open Pull Request on `github.com`. After review, merge into `main` branch safely!
+
+---
+
+### 💻 Code Walkthrough: DevExplorer Parallel API Fetcher (`app.js`)
 
 ```javascript
 async fetchDeveloperProfile(username) {
@@ -175,58 +256,3 @@ async fetchDeveloperProfile(username) {
 3. **Step 2 (Parallel Network Fetch)**: `Promise.all()` dispatches both the Profile and Repository endpoints concurrently, halving network latency compared to sequential calls.
 4. **Step 3 (JSON Stream Parsing)**: `await .json()` decodes the raw HTTP response streams into JavaScript Objects in memory.
 5. **Step 4 (State & Analytics Connection)**: Updates internal state `this.currentDev`, updates the in-memory cache, calls `computeAnalytics()` which uses `.reduce()` to calculate total stars, and triggers `renderProfileCard()` to update the DOM!
-
----
-
-### 💻 Walkthrough #2: Event Delegation & LocalStorage Bookmarking (`app.js`)
-
-```javascript
-// Step 1: Parent Event Listener (Event Delegation)
-this.quickTagsContainer.addEventListener("click", (e) => {
-  const tagBtn = e.target.closest(".tag-btn");
-  if (tagBtn) {
-    const username = tagBtn.dataset.user;
-    this.fetchDeveloperProfile(username);
-  }
-});
-
-// Step 2: LocalStorage State Management
-toggleBookmark(user) {
-  const exists = this.bookmarks.some(b => b.login === user.login);
-  if (exists) {
-    this.bookmarks = this.bookmarks.filter(b => b.login !== user.login);
-  } else {
-    this.bookmarks.push(user);
-  }
-  localStorage.setItem("bookmarks", JSON.stringify(this.bookmarks));
-  this.showToast("Bookmark updated ⭐");
-}
-```
-
-#### 🗣️ How to Explain on Screen:
-1. **Trigger**: User clicks any button within the container.
-2. **Event Delegation**: Instead of binding individual listeners to every button, a single listener on `#quickTagsContainer` catches the bubbling event. `e.target.closest(".tag-btn")` extracts the target element.
-3. **Data Extraction**: Reads `data-user` attribute directly from the DOM node and passes it to `fetchDeveloperProfile(username)`.
-4. **LocalStorage Persistence**: `toggleBookmark()` verifies existence via `.some()`, updates the array via `.filter()` / `.push()`, serializes with `JSON.stringify()`, and persists to `localStorage.setItem()`.
-
----
-
-### 💻 Walkthrough #3: Node.js Asynchronous File Operations (`Day-04/practice-snippets.js`)
-
-```javascript
-const fs = require('fs/promises');
-const path = require('path');
-
-async function logTrainingData(data) {
-  const filePath = path.join(__dirname, 'log.json');
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-  const readContent = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(readContent);
-}
-```
-
-#### 🗣️ How to Explain on Screen:
-1. **Module Import**: `require('fs/promises')` imports Node's asynchronous file system module.
-2. **Path Resolution**: `path.join(__dirname, ...)` resolves the absolute system path safely across Windows/Linux.
-3. **Non-Blocking Write**: `fs.writeFile()` offloads disk write to libuv worker threads without freezing the single-threaded Event Loop.
-4. **Read & Parse**: `fs.readFile(..., 'utf-8')` reads the string back from disk, and `JSON.parse()` converts it back into an active JavaScript Object.
