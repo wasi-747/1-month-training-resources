@@ -2,6 +2,20 @@
 node_modules/
 .pnpm-store/
 
+# Python scripts & tools
+*.py
+__pycache__/
+
+# Assets directory
+assets/
+
+# Temporary PowerPoint Locks & Intermediate Decks
+~$*.pptx
+Presentation_1_Modern_Web_Foundations.pptx
+Week_1_Interactive_Presentation.pptx
+Week_1_Presentation_Clean_Executive.pptx
+Week_1_Presentation_Obsidian_Gold.pptx
+
 # Environment & Secrets
 .env
 .env.local
