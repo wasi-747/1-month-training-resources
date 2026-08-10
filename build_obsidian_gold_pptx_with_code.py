@@ -286,10 +286,10 @@ def create_obsidian_gold_code_deck():
     p.space_after = Pt(14)
 
     bullets_s4 = [
-        ("Block Scope & TDZ (const vs let vs var)", "const by default prevents identifier rebinding. Eliminated var scope-leakage bugs and hoisting hazards via Temporal Dead Zone (TDZ)."),
-        ("Single-Threaded Call Stack (LIFO)", "V8 executes synchronous JavaScript code sequentially. Blocking operations are offloaded to background Web APIs / Libuv."),
-        ("Microtask Queue (VIP Priority)", "Promises (.then, async/await) enter the Microtask queue, executing immediately when Call Stack empties before any Macrotask."),
-        ("Macrotask Queue (setTimeout)", "Timers execute strictly after all microtasks finish. Used in Toast notification auto-dismissal.")
+        ("Block Scope & TDZ (app.js: L162, L273)", "const / let are confined strictly within enclosing {}. Accessing them before initialization throws ReferenceError (TDZ), eliminating var hoisting bugs."),
+        ("Single-Threaded Call Stack LIFO (app.js: L206)", "V8 executes synchronous functions line-by-line (Last-In, First-Out). Pushes renderProfileCard(), executes, pops it off, then pushes computeAnalytics()."),
+        ("Microtask VIP Queue (app.js: L181, L197)", "Promise.all() and await res.json() resolve in the Microtask Queue with VIP priority, draining immediately when Call Stack clears before any Macrotask."),
+        ("Macrotask Queue (app.js: L497)", "setTimeout(() => toast.remove(), 3000) enters Macrotask queue, executing only after all pending microtasks are complete.")
     ]
     for h, d in bullets_s4:
         ph = tf.add_paragraph()
@@ -305,11 +305,40 @@ def create_obsidian_gold_code_deck():
         pd.font.color.rgb = TEXT_BODY
         pd.space_after = Pt(10)
 
-    # Right: Diagram
-    add_card(s4, 6.8, 1.6, 5.733, 5.3)
-    loop_img = os.path.join(assets_dir, "event_loop_diagram.png")
-    if os.path.exists(loop_img):
-        s4.shapes.add_picture(loop_img, Inches(6.95), Inches(1.75), width=Inches(5.433))
+    # Right: Code Snippet Card
+    add_card(s4, 6.8, 1.6, 5.733, 5.3, bg_color=CODE_BG)
+    tb_c = s4.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.333), Inches(4.8))
+    tf_c = tb_c.text_frame
+    tf_c.word_wrap = True
+    tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
+
+    pc_title = tf_c.paragraphs[0]
+    pc_title.text = "📄 app.js: Engine Concurrency & Scope"
+    pc_title.font.size = Pt(13)
+    pc_title.font.bold = True
+    pc_title.font.color.rgb = GOLD_PRIMARY
+    pc_title.space_after = Pt(8)
+
+    code_s4 = (
+        "// 1. Block Scope & TDZ (app.js: L162)\n"
+        "const cleanUsername = username.toLowerCase();\n"
+        "// Accessing cleanUsername before L162 = TDZ ReferenceError\n\n"
+        "// 2. Microtask VIP Queue (app.js: L181)\n"
+        "const [userRes, reposRes] = await Promise.all([\n"
+        "  fetch(`https://api.github.com/users/${cleanUsername}`),\n"
+        "  fetch(`https://api.github.com/users/${cleanUsername}/repos`)\n"
+        "]); // Resolves with VIP priority in Microtask Queue!\n\n"
+        "// 3. Single-Threaded Call Stack LIFO (app.js: L206)\n"
+        "this.renderProfileCard(userData, false); // Stack Push -> Pop\n"
+        "this.computeAnalytics(reposData);        // Stack Push -> Pop\n\n"
+        "// 4. Macrotask Queue (app.js: L497)\n"
+        "setTimeout(() => toast.remove(), 3000);  // Runs after Microtasks"
+    )
+    pc_body = tf_c.add_paragraph()
+    pc_body.text = code_s4
+    pc_body.font.name = "Consolas"
+    pc_body.font.size = Pt(9.5)
+    pc_body.font.color.rgb = CODE_YELLOW
 
     # ==========================================
     # SLIDE 5: Mini-Project Architecture - Async & Promise.all()
@@ -749,10 +778,15 @@ def create_obsidian_gold_code_deck():
         pd.font.color.rgb = TEXT_BODY
         pd.space_after = Pt(10)
 
-    # Save
+    # Save with lock fallback
     out_path = os.path.join(base_dir, "Week_1_Presentation_Obsidian_Gold.pptx")
-    prs.save(out_path)
-    print(f"SUCCESS: Obsidian Gold Deck with Real Code Snippets saved to {out_path}")
+    try:
+        prs.save(out_path)
+        print(f"SUCCESS: Obsidian Gold Deck saved to {out_path}")
+    except PermissionError:
+        fallback_path = os.path.join(base_dir, "Week_1_Presentation_Obsidian_Gold_v2.pptx")
+        prs.save(fallback_path)
+        print(f"SUCCESS: File locked in PowerPoint. Saved updated deck to {fallback_path}")
 
 if __name__ == "__main__":
     create_obsidian_gold_code_deck()
