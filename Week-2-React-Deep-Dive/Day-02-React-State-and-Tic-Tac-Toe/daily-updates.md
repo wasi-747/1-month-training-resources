@@ -13,26 +13,25 @@
 ## 🟡 Mid-Day Progress Update — Tuesday (Week 2, Day 2)
 
 - ✅ **Completed:**
-  - Deep-dived into `useState` hook syntax, initial state initialization, and updater functions (`setCount(prev => prev + 1)`).
-  - Analyzed why direct mutations (`board[0] = 'X'`) break React's re-render diffing algorithm, and adopted immutable spread cloning.
+  1. Studied React Component State & `useState` hook mechanics (Memory & re-rendering triggers).
+  2. Understood State Immutability: Why we avoid direct mutations and use Spread Operator (`...`).
+  3. Committed and pushed mid-day practice components, study notes, and updates to GitHub.
 - 🔄 **In Progress:**
-  - Designing the modular Tic-Tac-Toe component hierarchy (`Square`, `Board`, `Game`).
-- ⚠️ **Issues / Blockers:** None. All exercises proceeding smoothly on schedule.
+  - Exploring "Lifting State Up" architecture and designing Tic-Tac-Toe component structures.
+- ⚠️ **Issues / Blockers:** University class schedule in the afternoon.
 
 ---
 
 ## 🏁 End of Day (EOD) Update — Tuesday (Week 2, Day 2)
 
 - ✅ **Accomplished Today:**
-  - Implemented stateful React components using the `useState` hook.
-  - Successfully built the modular Tic-Tac-Toe application with full game logic and turn tracking.
-  - Implemented the Time-Travel move history feature allowing players to jump back to any previous move.
-  - Documented Day 2 React State architecture notes and updated repository.
+  1. Studied "Lifting State Up": Elevated state from child `Square` components to the parent `Board` component and passed event handlers via props.
+  2. Formatted comprehensive study guides, code explanations, and committed all working React components to GitHub.
 
 - 🔗 **GitHub Repository:** https://github.com/wasi-747/1-month-training-resources
 
-- 📝 **Key Learnings:** React component memory (State), immutable update patterns, lifting state up for synchronized child components, and historical state arrays.
+- 📝 **Key Learnings:** Component memory architecture (`useState`), immutable state updates with the Spread Operator (`...`), unidirectional callback props, and time-travel history slicing.
 
-- ❓ **Open Issues / Blockers:** None. All components tested and verified.
+- ⚠️ **Blockers / Issues:** I have not built the complete interactive **Tic-Tac-Toe Game** yet due to university classes.
 
-- 🎯 **Tomorrow's Focus (Wednesday - Week 2, Day 3):** React Side Effects, `useEffect` Hook lifecycle management, and custom API data-fetching hooks.
+- 🎯 **Tomorrow's Focus (Wednesday - Week 2, Day 3):** React Side Effects, `useEffect` Hook lifecycle management, dependency arrays, cleanup functions, custom API data-fetching hooks, and completing the Tic-Tac-Toe Game.
