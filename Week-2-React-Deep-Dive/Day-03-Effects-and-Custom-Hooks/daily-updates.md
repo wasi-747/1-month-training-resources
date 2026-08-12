@@ -13,12 +13,18 @@
 ## 🟡 Mid-Day Progress Update — Wednesday (Week 2, Day 3)
 
 - ✅ **Completed:**
-  - Implemented the complete interactive Tic-Tac-Toe game with winning logic, draw detection, and time-travel history.
-  - Studied the basics of React Side Effects and the anatomy of the `useEffect` Hook.
+  - Implemented the complete interactive **Tic-Tac-Toe Game** by integrating the following concepts from our 1-Month curriculum resources:
+    1. **HTML5 Semantic Elements (Day 1):** Used `<header>` for titles, `<main>` for layout wrapping, and `<ol>` for move history list logs.
+    2. **CSS Layouts (Day 1):** Utilized CSS Grid for the 3x3 board matrix (`grid-template-columns: repeat(3, 85px)`) and Flexbox for scoreboard alignment and control button rows.
+    3. **ES6+ JavaScript (Day 2):** Applied the Spread Operator (`...`) for immutable array and object copying to preserve state histories.
+    4. **Higher-Order Array Methods (Day 2):** Used `.map()` for dynamic JSX button list rendering and `.every()` (`squares.every(Boolean)`) for game draw state validation checks.
+    5. **React Memory State (Week 2):** Applied the `useState` hook for tracking board history arrays, active moves, and game scores (X wins, O wins, Draws).
+    6. **Lifting State Up (Week 2):** Managed and elevated grid cell state from child `Square` components to the parent `Board` controller.
+  - Successfully built and deployed the final production bundle to **GitHub Pages** (configured base url paths in `vite.config.js` and forced-committed `dist/` build directory).
 - 🔄 **In Progress:**
-  - Exploring the differences in Dependency Arrays (no array vs empty array `[]` vs active dependency tracking).
-  - Studying component cleanup functions to prevent memory leaks in timers.
-- ⚠️ **Issues / Blockers:** None.
+  - Studying **React Side Effects** and the lifecycle of the **`useEffect` Hook** to synchronize components with external systems.
+  - Learning **Dependency Arrays** (empty array `[]` vs specific state trackers) and **Component Cleanup** functions to prevent browser memory leaks.
+- ⚠️ **Issues / Blockers:** None. All features are deployed and live on GitHub Pages.
 
 ---
 
