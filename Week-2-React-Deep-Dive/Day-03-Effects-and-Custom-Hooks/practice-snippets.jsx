@@ -196,6 +196,7 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function TicTacToeGame() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+  const [scores, setScores] = useState({ xWins: 0, oWins: 0, draws: 0 });
 
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
@@ -204,40 +205,91 @@ export default function TicTacToeGame() {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+
+    // Calculate if this play concludes the round
+    const winner = calculateWinner(nextSquares);
+    const isDraw = !winner && nextSquares.every(Boolean);
+
+    if (winner) {
+      setScores(prev => ({
+        ...prev,
+        xWins: winner === 'X' ? prev.xWins + 1 : prev.xWins,
+        oWins: winner === 'O' ? prev.oWins + 1 : prev.oWins
+      }));
+    } else if (isDraw) {
+      setScores(prev => ({
+        ...prev,
+        draws: prev.draws + 1
+      }));
+    }
   }
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
 
+  function handleNextRound() {
+    setHistory([Array(9).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  function handleResetScores() {
+    setScores({ xWins: 0, oWins: 0, draws: 0 });
+    setHistory([Array(9).fill(null)]);
+    setCurrentMove(0);
+  }
+
   return (
-    <div style={{ display: 'flex', gap: '2rem', padding: '1.5rem', background: '#121214', color: '#f4f4f5', borderRadius: '12px', border: '1px solid #2a2a32', marginTop: '1rem' }}>
-      <div>
-        <h3 style={{ color: '#f59e0b', margin: '0 0 1rem 0' }}>Tic-Tac-Toe Game (Completed)</h3>
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+    <div style={{ background: '#121214', color: '#f4f4f5', borderRadius: '12px', border: '1px solid #2a2a32', padding: '1.5rem', marginTop: '1rem' }}>
+      {/* 📊 Scoreboard */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: '#09090b', border: '1px solid #2a2a32', borderRadius: '8px', marginBottom: '1.5rem' }}>
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <div style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase' }}>Player X</div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 'bold', color: '#f59e0b' }}>{scores.xWins} Wins</div>
+        </div>
+        <div style={{ flex: 1, textAlign: 'center', borderLeft: '1px solid #2a2a32', borderRight: '1px solid #2a2a32' }}>
+          <div style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase' }}>Draws</div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 'bold' }}>{scores.draws}</div>
+        </div>
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <div style={{ fontSize: '0.75rem', color: '#a1a1aa', textTransform: 'uppercase' }}>Player O</div>
+          <div style={{ fontSize: '1.15rem', fontWeight: 'bold', color: '#38bdf8' }}>{scores.oWins} Wins</div>
+        </div>
       </div>
-      <div style={{ borderLeft: '1px solid #2a2a32', paddingLeft: '1.5rem' }}>
-        <h4>Moves History</h4>
-        <ol style={{ paddingLeft: '1rem', maxHeight: '180px', overflowY: 'auto' }}>
-          {history.map((_, move) => (
-            <li key={move} style={{ marginBottom: '0.35rem' }}>
-              <button 
-                onClick={() => jumpTo(move)}
-                style={{
-                  padding: '0.2rem 0.5rem',
-                  fontSize: '0.8rem',
-                  background: move === currentMove ? '#f59e0b' : '#27272a',
-                  color: move === currentMove ? '#000' : '#f4f4f5',
-                  border: '1px solid #3f3f46',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                {move > 0 ? `Go to move #${move}` : 'Go to game start'}
-              </button>
-            </li>
-          ))}
-        </ol>
+
+      <div style={{ display: 'flex', gap: '2rem' }}>
+        <div>
+          <h3 style={{ color: '#f59e0b', margin: '0 0 1rem 0' }}>Tic-Tac-Toe Game (Completed)</h3>
+          <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+          
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+            <button onClick={handleNextRound} style={{ padding: '0.4rem 0.8rem', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Next Round 🔁</button>
+            <button onClick={handleResetScores} style={{ padding: '0.4rem 0.8rem', background: '#3f3f46', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Reset Scores 🧹</button>
+          </div>
+        </div>
+        <div style={{ borderLeft: '1px solid #2a2a32', paddingLeft: '1.5rem', flex: 1 }}>
+          <h4>Moves History</h4>
+          <ol style={{ paddingLeft: '1rem', maxHeight: '180px', overflowY: 'auto' }}>
+            {history.map((_, move) => (
+              <li key={move} style={{ marginBottom: '0.35rem' }}>
+                <button 
+                  onClick={() => jumpTo(move)}
+                  style={{
+                    padding: '0.2rem 0.5rem',
+                    fontSize: '0.8rem',
+                    background: move === currentMove ? '#f59e0b' : '#27272a',
+                    color: move === currentMove ? '#000' : '#f4f4f5',
+                    border: '1px solid #3f3f46',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {move > 0 ? `Go to move #${move}` : 'Go to game start'}
+                </button>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </div>
   );
