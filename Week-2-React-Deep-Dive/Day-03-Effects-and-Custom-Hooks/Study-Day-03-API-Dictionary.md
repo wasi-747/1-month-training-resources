@@ -66,3 +66,10 @@
 * **Return Value & Type:** A **`Promise`** that resolves to parsed **JavaScript objects or arrays**.
 * **Code Reference:** [`Day-03-Effects-and-Custom-Hooks/practice-snippets.jsx: Line 76`](file:///d:/Study/Projects/1%20month%20training%20resources/Week-2-React-Deep-Dive/Day-03-Effects-and-Custom-Hooks/practice-snippets.jsx#L76)
 * **Architectural Reason:** Decodes and parses raw incoming HTTP payload bodies asynchronously.
+
+### 6. Functional State Updater (`setScores(prev => ({ ...prev, xWins: prev.xWins + 1 }))`)
+* **Identity:** State updater callback pattern.
+* **Return Value & Type:** **`undefined`** (Nothing). The callback itself returns a new **State Object**.
+* **Code Reference:** [`Day-03-Effects-and-Custom-Hooks/practice-snippets.jsx: Line 212`](file:///d:/Study/Projects/1%20month%20training/resources/Week-2-React-Deep-Dive/Day-03-Effects-and-Custom-Hooks/practice-snippets.jsx#L212)
+* **Architectural Reason:** Safely reads the most recent, up-to-date state values (`prev`) directly from the React queue. This prevents race conditions and stale closure issues when updating nested state object counts.
+
