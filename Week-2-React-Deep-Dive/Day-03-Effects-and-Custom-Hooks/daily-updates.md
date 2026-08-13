@@ -30,16 +30,15 @@
 
 ## 🏁 End of Day (EOD) Update — Wednesday (Week 2, Day 3)
 
-- ✅ **Accomplished Today:**
-  - Built the full interactive Tic-Tac-Toe game with time-travel history.
-  - Studied `useEffect` Hook, dependency arrays, and component cleanup mechanisms.
-  - Created a reusable custom hook (`useFetch`) for fetching API data.
-  - Pushed all study files and practice code to GitHub.
+- 🔄 **Carried Over to Thursday (Day 4):**
+  - Finalizing & integrating custom `useFetch` Hook in project components.
+  - Documenting detailed JS & React API Dictionary mapping return values, types, and line numbers.
+  - Committing and pushing all updated study notes, guides, and practice files to GitHub.
 
 - 🔗 **GitHub Repository:** https://github.com/wasi-747/1-month-training-resources
 
-- 📝 **Key Learnings:** Asynchronous side effects, useEffect dependency arrays, memory leak prevention via cleanups, and custom React hook extraction.
+- 📝 **Key Learnings:** Asynchronous side effects, useEffect dependency arrays, and memory leak prevention via cleanups.
 
-- ❓ **Open Issues / Blockers:** None.
+- ❓ **Open Issues / Blockers:** Items 5, 6, 7 carried over to Thursday (Day 4).
 
-- 🎯 **Tomorrow's Focus (Thursday - Week 2, Day 4):** Global State Management, React Context API, and starting the Week 2 Theme Task Tracker Project.
+- 🎯 **Tomorrow's Focus (Thursday - Week 2, Day 4):** Complete carried-over `useFetch` & API Dictionary tasks + Master MongoDB (CRUD, Schemas, Mongoose ODM, Aggregations) for Week 2 presentation prep.

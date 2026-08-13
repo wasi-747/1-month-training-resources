@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { CustomHooksDemo } from './components/CustomHooksDemo';
 
 // [A. Square Component]
 function Square({ value, onSquareClick }) {
@@ -167,8 +168,8 @@ export default function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1 className="main-title">🎮 Tic-Tac-Toe Game</h1>
-        <p className="subtitle">React Component Memory, State Lifting & Immutability</p>
+        <h1 className="main-title">🎮 React & MongoDB Deep Dive</h1>
+        <p className="subtitle">Custom Hooks, State Management & Full-Stack Fundamentals</p>
       </header>
 
       <main className="dashboard-grid">
@@ -177,7 +178,10 @@ export default function App() {
           <p className="card-description">Click on any square to play. Use the right timeline to undo/redo moves.</p>
           <TicTacToeGame />
         </div>
+
+        <CustomHooksDemo />
       </main>
     </div>
   );
 }
+
