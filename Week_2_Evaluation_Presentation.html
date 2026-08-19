@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Week 2 Technical Evaluation Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-slate: #0b0f19;
+      --card-bg: #151e32;
+      --card-border: #1e293b;
+      --cyan: #38bdf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --indigo: #818cf8;
+      --text-white: #ffffff;
+      --text-light: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-slate);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Presentation Screen Canvas (16:9) */
+    .deck-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      width: 90vw;
+      max-width: 1280px;
+      height: 82vh;
+      max-height: 720px;
+      background: radial-gradient(circle at top right, rgba(30, 41, 59, 0.4), var(--bg-slate) 80%);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 40px 50px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Header */
+    .slide-header {
+      margin-bottom: 20px;
+    }
+
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -0.02em;
+    }
+
+    .slide-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Grid Layouts */
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .grid-3x1 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .grid-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title.cyan { color: var(--cyan); }
+    .card-title.emerald { color: var(--emerald); }
+    .card-title.amber { color: var(--amber); }
+    .card-title.rose { color: var(--rose); }
+    .card-title.indigo { color: var(--indigo); }
+    .card-title.white { color: var(--text-white); }
+
+    .card-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-bullets li {
+      font-size: 1rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: flex-start;
+      line-height: 1.4;
+    }
+
+    .card-bullets li::before {
+      content: "•";
+      color: var(--cyan);
+      font-size: 1.3rem;
+      line-height: 1rem;
+      margin-right: 10px;
+    }
+
+    /* Solution Row (Slide 6) */
+    .solution-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .problem-box {
+      background: #18212f;
+      border: 1px solid rgba(251, 113, 133, 0.3);
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: var(--rose);
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .solution-box {
+      background: var(--card-bg);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: var(--emerald);
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Title Slide Special */
+    .title-slide-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      gap: 20px;
+    }
+
+    .main-heading {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sub-heading {
+      font-size: 1.6rem;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+
+    .badge {
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--emerald);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .presenter-tag {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* Live Link Banner */
+    .live-banner {
+      background: linear-gradient(135deg, #4338ca, #6366f1);
+      padding: 16px 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .live-banner a {
+      background: #ffffff;
+      color: #1e1b4b;
+      padding: 8px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+
+    .live-banner a:hover {
+      opacity: 0.9;
+    }
+
+    /* Bottom Controller Bar */
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      padding: 8px 18px;
+      border-radius: 30px;
+      z-index: 100;
+    }
+
+    .ctrl-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-light);
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--cyan);
+      color: #000;
+    }
+
+    .slide-counter {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+    
+    <!-- SLIDE 1: Title -->
+    <div class="slide active" id="slide-1">
+      <div class="title-slide-content">
+        <h1 class="main-heading">WEEK 2 EVALUATION PRESENTATION</h1>
+        <p class="sub-heading">React Deep Dive, MongoDB & Next.js Architecture</p>
+        <div class="badges-row">
+          <span class="badge">⚛️ React 18</span>
+          <span class="badge">⚡ Custom Hooks</span>
+          <span class="badge">🍃 MongoDB</span>
+          <span class="badge">🛡️ Mongoose</span>
+          <span class="badge">▲ Next.js</span>
+          <span class="badge">⚡ Vite</span>
+        </div>
+        <p class="presenter-tag">Presenter: <strong>Wasiur Rahman Sakib</strong> | Software Engineer Intern</p>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Executive Overview -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <h2 class="slide-title">Executive Overview</h2>
+        <p class="slide-subtitle">Week 2: 4 Core Modules</p>
+      </div>
+      <div class="grid-2x2">
+        <div class="card">
+          <h3 class="card-title cyan">⚛️ 01. React Paradigm</h3>
+          <ul class="card-bullets">
+            <li>Declarative UI Components</li>
+            <li>Virtual DOM Reconciliation Diffing</li>
+            <li>Predictable Unidirectional Data Flow</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title emerald">⚡ 02. State & Hooks</h3>
+          <ul class="card-bullets">
+            <li>Immutability & Reference Checking</li>
+            <li>useEffect External System Synchronization</li>
+            <li>Custom Hooks Architecture (useFetch, useToggle)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title amber">🍃 03. Database Layer</h3>
+          <ul class="card-bullets">
+            <li>MongoDB BSON Binary Document Storage</li>
+            <li>Mongoose Schema Validation & Types</li>
+            <li>Pre/Post Middleware & Aggregation Pipelines</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title indigo">▲ 04. Full-Stack Bridge</h3>
+          <ul class="card-bullets">
+            <li>Next.js App Router Paradigms</li>
+            <li>Server Components (Zero Client JS Bundle)</li>
+            <li>API Route Handlers & DB Caching</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: React Core & Immutability -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <h2 class="slide-title">React Core & Immutability</h2>
+        <p class="slide-subtitle">Foundational Architecture Principles</p>
+      </div>
+      <div class="grid-3x1">
+        <div class="card">
+          <h3 class="card-title cyan">⬇️ Uni-directional Flow</h3>
+          <ul class="card-bullets">
+            <li>Props flow strictly down to children</li>
+            <li>Event callbacks bubble updates up</li>
+            <li>Single Source of Truth eliminates desync</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title emerald">🌳 Virtual DOM</h3>
+          <ul class="card-bullets">
+            <li>In-memory lightweight JS tree representation</li>
+            <li>Reconciliation diffing checks changed nodes</li>
+            <li>Batched, minimal real DOM commits</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title rose">🔒 State Immutability</h3>
+          <ul class="card-bullets">
+            <li>O(1) Shallow Reference Check (prev !== next)</li>
+            <li>Spread operator [...prev] creates fresh pointers</li>
+            <li>Preserves isolated Time-Travel snapshots</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Lifecycle & Custom Hooks -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <h2 class="slide-title">Lifecycle & Custom Hooks Architecture</h2>
+        <p class="slide-subtitle">Managing Side Effects and Encapsulating Reusable Logic</p>
+      </div>
+      <div class="grid-3x1">
+        <div class="card">
+          <h3 class="card-title amber">🔄 useEffect Sync</h3>
+          <ul class="card-bullets">
+            <li>Synchronizes with external systems (APIs, Listeners)</li>
+            <li>Controlled dependency arrays prevent infinite loops</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title rose">🧹 Cleanup Phase</h3>
+          <ul class="card-bullets">
+            <li>return () => { ... } runs on unmount / re-run</li>
+            <li>AbortController cancels active fetch requests</li>
+            <li>Removes window listeners to eliminate memory leaks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title cyan">🧩 Custom Hooks</h3>
+          <ul class="card-bullets">
+            <li>Decouples complex side effects from UI rendering</li>
+            <li>useFetch: Handles data, loading, error & auto abort</li>
+            <li>useToggle: Manages modal & boolean UI state cleanly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: MongoDB & Next.js -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <h2 class="slide-title">MongoDB, Mongoose & Next.js Foundations</h2>
+        <p class="slide-subtitle">Backend Document Storage & Modern Rendering Paradigms</p>
+      </div>
+      <div class="grid-3x1">
+        <div class="card">
+          <h3 class="card-title emerald">🍃 MongoDB BSON</h3>
+          <ul class="card-bullets">
+            <li>Binary JSON (TLV byte structure with Date, ObjectId)</li>
+            <li>Embedded Sub-docs eliminate expensive SQL JOINs</li>
+            <li>Fast aggregation pipelines in database memory</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title amber">🛡️ Mongoose ODM</h3>
+          <ul class="card-bullets">
+            <li>Strict Schema validation & enum constraints</li>
+            <li>Pre-save normalization middleware (auto tag trim)</li>
+            <li>Fallback mock engine for resilient offline execution</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title indigo">▲ Next.js Paradigm</h3>
+          <ul class="card-bullets">
+            <li>Server Components: Direct DB query, 0 KB client JS</li>
+            <li>Client Components ('use client') for interactivity</li>
+            <li>Global singleton cached DB connection pool</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Challenges & Solutions -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <h2 class="slide-title">Technical Challenges & Engineering Solutions 🌟</h2>
+        <p class="slide-subtitle">Real-world Problem Diagnosis & Production Solutions</p>
+      </div>
+      <div class="grid-rows">
+        <div class="solution-row">
+          <div class="problem-box">⚠️ Async Race Conditions (Rapid clicks overwrite newer state)</div>
+          <div class="solution-box">💡 AbortController signal & useEffect cleanup in useFetch.js</div>
+        </div>
+        <div class="solution-row">
+          <div class="problem-box">⚠️ State Array Mutations (In-place array mutations corrupt history)</div>
+          <div class="solution-box">💡 Spread operator [...squares] & history.slice() in App.jsx</div>
+        </div>
+        <div class="solution-row">
+          <div class="problem-box">⚠️ Next.js Fast Refresh DB Connection Pool Leaks</div>
+          <div class="solution-box">💡 global.mongoose cached Singleton pattern in lib/mongodb.js</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Practical Demonstration -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <h2 class="slide-title">Practical Demonstration</h2>
+        <p class="slide-subtitle">Live Projects & Working Implementations</p>
+      </div>
+      <div class="grid-2x2" style="flex: unset; height: 340px;">
+        <div class="card">
+          <h3 class="card-title cyan">🎮 Tic-Tac-Toe Arena</h3>
+          <ul class="card-bullets">
+            <li>Immutable 9-square state grid</li>
+            <li>Time-Travel Move History branch exploration</li>
+            <li>Pure 8-line win-calculation algorithm</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title emerald">⚡ Custom Hooks Suite</h3>
+          <ul class="card-bullets">
+            <li>useFetch Live API data with loading & error states</li>
+            <li>useToggle instant show/hide state management</li>
+            <li>Decoupled reusable architecture</li>
+          </ul>
+        </div>
+      </div>
+      <div class="live-banner">
+        <span style="font-size: 1.1rem; font-weight: 600;">🚀 Live Deployed App URL (GitHub Pages):</span>
+        <a href="https://wasi-747.github.io/1-month-training-resources/Week-2-React-Deep-Dive/react-playground/dist/" target="_blank">Open Live App 🔗</a>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Engineering Principles -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <h2 class="slide-title">Engineering Principles & Best Practices</h2>
+        <p class="slide-subtitle">Core Architecture Guidelines Followed Across Codebase</p>
+      </div>
+      <div class="grid-2x2">
+        <div class="card">
+          <h3 class="card-title white">01. 🎯 Declarative UI</h3>
+          <ul class="card-bullets">
+            <li>State-driven views over imperative DOM manipulation</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title white">02. 🔗 Single Source of Truth</h3>
+          <ul class="card-bullets">
+            <li>Lift state to nearest common ancestor to prevent desync</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title white">03. 🛡️ Defensive UI Flow</h3>
+          <ul class="card-bullets">
+            <li>Loading skeletons, friendly error banners & offline fallbacks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title white">04. 📦 Modular Logic</h3>
+          <ul class="card-bullets">
+            <li>Clean separation of UI views and custom hooks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Roadmap -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <h2 class="slide-title">Roadmap: Looking Ahead</h2>
+        <p class="slide-subtitle">Timeline & Next Curriculum Deliverables</p>
+      </div>
+      <div class="grid-2x2">
+        <div class="card">
+          <h3 class="card-title rose">📅 Week 3: Academic Leave</h3>
+          <ul class="card-bullets">
+            <li>University Midterm Examinations</li>
+            <li>Mental consolidation of React architecture & hooks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 class="card-title cyan">🚀 Week 4: Next.js & React Native Mobile</h3>
+          <ul class="card-bullets">
+            <li>Cross-Platform iOS & Android Native Core</li>
+            <li>React Navigation Stacks & Hardware APIs</li>
+            <li>Full-Stack Backend Cloud Database Integration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Conclusion & Q&A -->
+    <div class="slide" id="slide-10">
+      <div class="title-slide-content">
+        <h1 class="main-heading" style="color: var(--emerald); -webkit-text-fill-color: var(--emerald);">THANK YOU!</h1>
+        <p class="sub-heading" style="color: var(--text-light);">Questions, Feedback & Live Project Walkthrough</p>
+        <div style="margin-top: 15px;">
+          <a href="https://wasi-747.github.io/1-month-training-resources/Week-2-React-Deep-Dive/react-playground/dist/" target="_blank" style="background: var(--cyan); color: #000; padding: 12px 28px; border-radius: 25px; text-decoration: none; font-weight: 700; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(56, 189, 248, 0.4);">
+            🎮 Launch Live Game Walkthrough 🔗
+          </a>
+        </div>
+        <p class="presenter-tag" style="margin-top: 25px;">Presenter: <strong>Wasiur Rahman Sakib</strong> | Software Engineer Intern</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Controls Bar -->
+  <div class="controls">
+    <button class="ctrl-btn" onclick="prevSlide()">◀ Prev</button>
+    <span class="slide-counter" id="counter">1 / 10</span>
+    <button class="ctrl-btn" onclick="nextSlide()">Next ▶</button>
+    <button class="ctrl-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(`slide-${n}`);
+      if (target) {
+        target.classList.add('active');
+        currentSlide = n;
+        document.getElementById('counter').innerText = `${currentSlide} / ${totalSlides}`;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) showSlide(currentSlide - 1);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // Keyboard Arrow Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+      if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+    });
+  </script>
+</body>
+</html>
