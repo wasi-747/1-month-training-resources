@@ -42,16 +42,22 @@ Welcome to my 1-Month Web Development Training repository! This repository track
 ├── README.md
 ├── .gitignore
 ├── Resources/
-│   └── README.md
+│   ├── README.md
+│   ├── monday-presentation-guidelines.md
+│   └── work-ethics-for-interns.md
 ├── Week-1-Web-Foundations-and-JS/
 │   ├── Day-01-Web-Design-Git-JS-Basics/
 │   ├── Day-02-Advanced-JS-and-Async/
 │   ├── Day-03-DOM-and-Mini-Project/
-│   ├── Day-04-Presentation-1/
-│   └── Day-05-Review-and-Feedback/
+│   └── Day-04-NodeJS-and-FileSystem/
 ├── Week-2-React-Deep-Dive/
-├── Week-3-Node-Express-MongoDB/
+│   ├── Day-01-Thinking-in-React-and-JSX/
+│   ├── Day-02-React-State-and-Tic-Tac-Toe/
+│   ├── Day-03-Effects-and-Custom-Hooks/
+│   ├── Day-04-MongoDB-and-Custom-Hooks/
+│   └── react-playground/
 └── Week-4-NextJS-FullStack/
+    └── Day-01-NextJS-Foundations/
 ```
 
 ---
