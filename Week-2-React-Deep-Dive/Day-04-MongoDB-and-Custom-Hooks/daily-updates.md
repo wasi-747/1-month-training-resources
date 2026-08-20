@@ -1,41 +1,38 @@
-# 📝 Daily Progress Updates — Week 2, Day 4 (Thursday)
+# 📝 Daily Progress Updates — Week 2, Day 4 (MongoDB CRUD & Queries Focus)
 
-## 📋 Daily TODO — Thursday, August 13 (Week 2, Day 4)
+## 📋 Daily TODO — (MongoDB CRUD & Query Deep Dive)
 
-* Build and integrate a reusable custom data-fetching Hook (`useFetch`) to manage loading, error, and data states.
-* Document a detailed JS & React API Dictionary mapping parameters, return values, types, and line numbers.
-* Explore MongoDB document structure, collection BSON formats, and core CRUD operations.
-* Learn MongoDB Query Comparison & Update Operators (`$gte`, `$in`, `$set`, `$inc`).
-* Define and practice Mongoose Schemas, Models, validation rules, and pre/post middleware hooks.
-* Understand MongoDB Aggregation Pipeline stages (`$match`, `$group`, `$project`, `$sort`).
-* Commit practice components, study notes, API dictionaries, and daily logs to GitHub.
+* Build and practice core MongoDB CRUD operations (`insertOne`, `insertMany`, `find`, `updateOne`, `deleteMany`).
+* Master MongoDB query comparison & logical operators (`$gte`, `$lte`, `$in`, `$nin`, `$and`, `$or`, `$not`).
+* Practice array queries and nested subdocument criteria (`$all`, `$size`, `$elemMatch`, regex searches).
+* Implement atomic field update modifiers (`$set`, `$inc`, `$currentDate`, `$unset`) and array modifiers (`$push`, `$addToSet`, `$pull`).
+* Construct multi-stage MongoDB Aggregation Pipelines (`$match`, `$group`, `$project`, `$sort`) for analytics.
+* Explore MongoDB Indexing strategies (Single, Compound, Unique) and execution plan inspection (`explain("executionStats")`).
+* Commit practice files, study references, and daily logs to GitHub.
 
 ---
 
-## 🟡 Mid-Day Progress Update — Thursday (Week 2, Day 4)
+## 🟡 Mid-Day Progress Update
 
 * ✅ **Completed:**
-  * Reusable custom Hooks (`useFetch`, `useToggle`) extraction, line-by-line mechanics, memory leak prevention via cleanup flags, and usage logic.
-  * Comprehensive **JS & React API Dictionary** documenting return types, parameters, line numbers, and use cases (`useState`, `useEffect`, `fetch()`, `.map()`, `.filter()`).
+  * Practiced MongoDB CRUD operations (`insertOne`, `insertMany`, `updateOne`, `deleteOne`).
 * 🔄 **In Progress:**
-  * Exploring MongoDB document structure, collection BSON formats, and core CRUD operations.
-  * Setting up Mongoose Schema models and validation rules.
+  * MongoDB queries (Comparison operators, Logical operators, and Aggregation pipelines).
 * ⚠️ **Issues / Blockers:** None.
 
 ---
 
-## 🏁 End of Day (EOD) Update — Thursday (Week 2, Day 4)
+## 🏁 End of Day (EOD) Update
 
-* ✅ **Completed:**
-  1. **Reusable Custom Hooks (`useFetch`, `useToggle`):** Built and integrated reusable custom data-fetching and UI toggle state hooks with memory leak prevention via `active`/`isMounted` cleanup flags.
-  2. **Detailed JS & React API Dictionary:** Authored [`Study-Day-04-MongoDB-and-API-Dictionary.md`](file:///d:/Study/Projects/1%20month%20training%20resources/Week-2-React-Deep-Dive/Day-04-MongoDB-and-Custom-Hooks/Study-Day-04-MongoDB-and-API-Dictionary.md) mapping parameters, return types, code line numbers, and architectural reasons.
-  3. **MongoDB Architecture & BSON Storage:** Explored NoSQL document structures, collections, field types, and 12-byte `ObjectId` primary keys in BSON format.
-  4. **MongoDB Comparison & Update Operators:** Practiced `$gte`, `$gt`, `$in`, `$set`, `$inc`, and `$push` query and update operations.
-  5. **Mongoose ODM Schemas & Middleware Hooks:** Defined Mongoose Schemas with strict type validations (`required`, `trim`, `enum`, `min`, `max`) and pre/post save lifecycle middleware hooks.
-  6. **MongoDB Aggregation Pipelines:** Constructed multi-stage aggregations (`$match`, `$group`, `$project`, `$sort`) for analytics processing.
-  7. **GitHub Tracking & Log Syncing:** Committed all practice components, study notes, API dictionary, and daily progress logs to GitHub.
+* ✅ **Accomplished Today:**
+  1. **MongoDB CRUD Operations:** Implemented comprehensive insert (`insertOne`, `insertMany`), read, atomic updates (`$set`, `$inc`, `$addToSet`, `$push`, `$pull`), and delete operations.
+  2. **Advanced MongoDB Queries:** Practiced comparison operators (`$gt`, `$gte`, `$lt`, `$lte`, `$in`, `$nin`), logical filters (`$or`, `$and`), regex pattern search, and nested array queries (`$all`, `$elemMatch`).
+  3. **Aggregation Pipelines:** Built multi-stage data aggregation pipelines (`$match` ➡️ `$group` ➡️ `$project` ➡️ `$sort`) to calculate category averages, total revenues, and document summaries.
+  4. **Indexing & Query Performance:** Explored single-field, compound, and unique indexes, and analyzed query performance using `explain("executionStats")`.
+  5. **Practice Script & Documentation:** Authored [`mongodb-crud-and-queries-practice.js`](file:///d:/Study/Projects/1%20month%20training%20resources/Week-2-React-Deep-Dive/Day-04-MongoDB-and-Custom-Hooks/mongodb-crud-and-queries-practice.js) and synced all study notes.
+  6. **GitHub Tracking:** Pushed all practice code, study references, and daily logs to GitHub repository.
 
 * 🔗 **GitHub Repository:** [https://github.com/wasi-747/1-month-training-resources](https://github.com/wasi-747/1-month-training-resources)
-* 📝 **Key Learnings:** Custom Hook encapsulation, memory leak prevention, MongoDB NoSQL document architecture, BSON vs JSON, Mongoose middleware hooks, and aggregation pipelines.
-* ⚠️ **Issues / Blockers:** None. All Day 04 curriculum objectives successfully completed.
-* 🎯 **Tomorrow's Focus (Friday - Week 2, Day 5):** End-to-end full-stack integration, polishing presentation slides, and dry run for Week 2 evaluation presentation.
+* 📝 **Key Learnings:** MongoDB BSON document design, atomic update operators, subdocument query filtering, aggregation accumulators, and index optimization.
+* ❓ **Open Issues / Blockers:** None.
+* 🎯 **Tomorrow's Focus:** Full-stack integration connecting Mongoose schemas and MongoDB queries with Next.js Route Handlers.
