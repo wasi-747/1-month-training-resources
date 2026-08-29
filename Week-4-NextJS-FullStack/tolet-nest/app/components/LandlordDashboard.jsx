@@ -569,11 +569,12 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                     onChange={(e) => setFormData({ ...formData, propertyType: e.target.value })}
                     style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px' }}
                   >
-                    <option value="single_room">Single Private Room</option>
-                    <option value="master_bed">Master Bed (Attached Bath)</option>
-                    <option value="shared_seat">Shared Seat (Mess)</option>
-                    <option value="sublet">Family Sublet Room</option>
-                    <option value="full_flat">Entire Full Flat</option>
+                    <option value="seat_rent">🛏️ Seat Rent (১/২/৩ সিট ভাড়া)</option>
+                    <option value="room_rent">🚪 Single Room (রুম ভাড়া)</option>
+                    <option value="master_bed">👑 Master Bed with Attached Bath</option>
+                    <option value="dining_space">🍽️ Dining Space Bed (ডাইনিং স্পেস)</option>
+                    <option value="sublet">🏡 Sublet Room (সাবলেট ভাড়া)</option>
+                    <option value="full_flat">🏢 Entire Full Flat (সম্পূর্ণ ফ্ল্যাট)</option>
                   </select>
                 </div>
                 <div>

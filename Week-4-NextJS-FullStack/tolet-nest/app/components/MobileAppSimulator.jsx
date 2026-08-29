@@ -142,6 +142,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all' | 'seat' | 'room' | 'dining_space' | 'sublet' | 'full_flat'
   const [selectedTenantType, setSelectedTenantType] = useState('all');
   const [selectedRoomType, setSelectedRoomType] = useState('all');
   const [maxRent, setMaxRent] = useState(30000);
@@ -207,6 +208,16 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
         item.area.toLowerCase().includes(q) ||
         item.addressText.toLowerCase().includes(q);
       if (!match) return false;
+    }
+
+    if (selectedCategory !== 'all') {
+      const pType = item.propertyType || '';
+      const rCat = item.rentalCategory || '';
+      if (selectedCategory === 'seat' && pType !== 'seat_rent' && pType !== 'shared_seat' && rCat !== 'seat') return false;
+      if (selectedCategory === 'dining_space' && pType !== 'dining_space' && rCat !== 'dining_space') return false;
+      if (selectedCategory === 'sublet' && pType !== 'sublet' && rCat !== 'sublet') return false;
+      if (selectedCategory === 'full_flat' && pType !== 'full_flat' && rCat !== 'full_flat') return false;
+      if (selectedCategory === 'room' && !['room_rent', 'single_room', 'master_bed'].includes(pType) && rCat !== 'room') return false;
     }
 
     if (selectedTenantType !== 'all' && item.tenantType !== selectedTenantType && item.tenantType !== 'any') {
@@ -721,10 +732,41 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                 </button>
               </div>
 
-              {/* Filter Chips Bar */}
+              {/* Rental Category Chips (Seat, Room, Dining, Sublet, Flat) */}
+              <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '5px', marginBottom: '6px' }}>
+                {[
+                  { id: 'all', label: 'All Types' },
+                  { id: 'seat', label: '🛏️ Seat (১/২/৩ সিট)' },
+                  { id: 'room', label: '🚪 Room (রুম)' },
+                  { id: 'dining_space', label: '🍽️ Dining Space' },
+                  { id: 'sublet', label: '🏡 Sublet' },
+                  { id: 'full_flat', label: '🏢 Full Flat' },
+                ].map((chip) => (
+                  <button
+                    key={chip.id}
+                    onClick={() => setSelectedCategory(chip.id)}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      padding: '4px 9px',
+                      borderRadius: '6px',
+                      fontSize: '0.68rem',
+                      fontFamily: 'Space Grotesk',
+                      fontWeight: 700,
+                      background: selectedCategory === chip.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                      color: selectedCategory === chip.id ? '#fff' : 'var(--text-secondary)',
+                      border: `1px solid ${selectedCategory === chip.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tenant Preference Chips */}
               <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '6px', marginBottom: '10px' }}>
                 {[
-                  { id: 'all', label: 'All' },
+                  { id: 'all', label: '👥 All Tenants' },
                   { id: 'bachelor_male', label: 'Bachelor Male' },
                   { id: 'bachelor_female', label: 'Female Student' },
                   { id: 'family', label: 'Family' },
@@ -734,13 +776,11 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                     onClick={() => setSelectedTenantType(chip.id)}
                     style={{
                       whiteSpace: 'nowrap',
-                      padding: '4px 9px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      fontFamily: 'Space Grotesk',
-                      fontWeight: 700,
-                      background: selectedTenantType === chip.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
-                      color: selectedTenantType === chip.id ? '#fff' : 'var(--text-secondary)',
+                      padding: '3px 8px',
+                      borderRadius: '5px',
+                      fontSize: '0.66rem',
+                      background: selectedTenantType === chip.id ? 'var(--bg-surface-3)' : 'transparent',
+                      color: selectedTenantType === chip.id ? '#fff' : 'var(--text-muted)',
                       border: '1px solid var(--border-subtle)',
                       cursor: 'pointer',
                     }}
@@ -1225,15 +1265,51 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                   </div>
                 )}
 
-                {/* Preference */}
+                {/* Rental Category & Quantity */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                    Rental Type *
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', marginBottom: '6px' }}>
+                    {[
+                      { id: 'seat_rent', cat: 'seat', label: '🛏️ Seat (সিট)' },
+                      { id: 'room_rent', cat: 'room', label: '🚪 Room (রুম)' },
+                      { id: 'dining_space', cat: 'dining_space', label: '🍽️ Dining Space' },
+                      { id: 'sublet', cat: 'sublet', label: '🏡 Sublet' },
+                      { id: 'full_flat', cat: 'full_flat', label: '🏢 Full Flat' },
+                      { id: 'master_bed', cat: 'room', label: '👑 Master Bed' },
+                    ].map((t) => (
+                      <button
+                        type="button"
+                        key={t.id}
+                        onClick={() => setMobilePostData({ ...mobilePostData, propertyType: t.id, rentalCategory: t.cat })}
+                        style={{
+                          background: mobilePostData.propertyType === t.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                          color: mobilePostData.propertyType === t.id ? '#fff' : 'var(--text-secondary)',
+                          border: `1px solid ${mobilePostData.propertyType === t.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                          padding: '5px 4px',
+                          borderRadius: '5px',
+                          fontSize: '0.66rem',
+                          fontFamily: 'Space Grotesk',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Available Quantity / Units & Preference */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
-                      Room Type
+                      Available Count *
                     </label>
                     <select
-                      value={mobilePostData.propertyType}
-                      onChange={(e) => setMobilePostData({ ...mobilePostData, propertyType: e.target.value })}
+                      value={mobilePostData.quantityAvailable || 1}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, quantityAvailable: Number(e.target.value) })}
                       style={{
                         width: '100%',
                         background: 'var(--bg-surface-2)',
@@ -1245,15 +1321,15 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                         outline: 'none',
                       }}
                     >
-                      <option value="single_room">Single Room</option>
-                      <option value="master_bed">Master Bed</option>
-                      <option value="shared_room">Shared Seat</option>
-                      <option value="sublet">Sublet</option>
+                      <option value="1">1 Unit / 1 Seat / 1 Room</option>
+                      <option value="2">2 Units / 2 Seats / 2 Rooms</option>
+                      <option value="3">3 Units / 3 Seats / 3 Rooms</option>
+                      <option value="4">4+ Units (Full Flat/Mess)</option>
                     </select>
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
-                      For Whom
+                      Tenant Preference
                     </label>
                     <select
                       value={mobilePostData.tenantType}
@@ -1272,6 +1348,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                       <option value="bachelor_male">Bachelor Male</option>
                       <option value="bachelor_female">Female Student</option>
                       <option value="job_holder">Job Holder</option>
+                      <option value="family">Family</option>
                       <option value="any">Anyone</option>
                     </select>
                   </div>

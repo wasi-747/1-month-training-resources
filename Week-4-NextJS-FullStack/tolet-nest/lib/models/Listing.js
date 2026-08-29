@@ -55,8 +55,17 @@ const ListingSchema = new mongoose.Schema(
     },
     propertyType: {
       type: String,
-      enum: ['single_room', 'master_bed', 'shared_seat', 'sublet', 'full_flat'],
-      default: 'single_room',
+      enum: ['seat_rent', 'room_rent', 'single_room', 'master_bed', 'shared_seat', 'dining_space', 'sublet', 'full_flat'],
+      default: 'room_rent',
+    },
+    rentalCategory: {
+      type: String,
+      enum: ['seat', 'room', 'dining_space', 'sublet', 'full_flat'],
+      default: 'room',
+    },
+    quantityAvailable: {
+      type: Number,
+      default: 1, // e.g. 1 seat, 2 seats, 1 room, 3 rooms, 1 flat
     },
     tenantType: {
       type: String,
