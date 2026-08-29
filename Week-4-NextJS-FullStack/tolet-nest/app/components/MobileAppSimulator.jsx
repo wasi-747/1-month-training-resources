@@ -32,7 +32,11 @@ import {
   Users,
   GraduationCap,
   Home,
-  Building
+  Building,
+  Layers,
+  ZoomIn,
+  ZoomOut,
+  Navigation
 } from 'lucide-react';
 
 // Web Audio API Ringtone & Call Audio Synthesizer
@@ -173,6 +177,30 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
     isDetecting: false,
   });
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  // Interactive Live Map & Radar State
+  const [mapZoom, setMapZoom] = useState(1); // 0.5 (wide zoom out 5km) to 2.0 (hyper-local 500m)
+  const [mapMode, setMapMode] = useState('radar'); // 'radar' | 'street'
+  const [selectedMapListing, setSelectedMapListing] = useState(null);
+
+  // Map Coordinate Projection relative to userLocation
+  const calculatePinPosition = (coords) => {
+    if (!coords || coords.length < 2) return { x: 50, y: 50, isVisible: false };
+    const [lng, lat] = coords;
+    const dLng = lng - userLocation.lng;
+    const dLat = lat - userLocation.lat;
+
+    // Scale coordinates relative to zoom level
+    const scale = 2200 * mapZoom;
+    const x = 50 + dLng * scale;
+    const y = 50 - dLat * scale;
+
+    const clampedX = Math.max(8, Math.min(92, x));
+    const clampedY = Math.max(12, Math.min(88, y));
+    const isVisible = x >= 2 && x <= 98 && y >= 4 && y <= 96;
+
+    return { x: clampedX, y: clampedY, isVisible };
+  };
 
   // Auto-Detect Real Browser / Device GPS
   const detectLiveGPS = () => {
@@ -634,16 +662,149 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                 </div>
               </div>
 
-              {/* Architectural Dhaka Map Radar Texture */}
-              <div className="dhaka-radar-container" style={{ height: '145px', marginBottom: '14px' }}>
-                <div className="dhaka-map-texture" />
-                <div className="dhaka-radar-dial">
-                  <div className="dhaka-radar-beam" />
-                </div>
+              {/* Interactive Live Dhaka Map & Radar Canvas */}
+              <div
+                className="dhaka-radar-container"
+                style={{
+                  height: '210px',
+                  marginBottom: '14px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '16px',
+                  border: '1px solid var(--border-medium)',
+                  background: mapMode === 'street'
+                    ? 'radial-gradient(circle at center, #1e1b17 0%, #110f0d 100%)'
+                    : 'radial-gradient(circle at center, #241f1a 0%, #14120f 80%)',
+                }}
+              >
+                {/* Dhaka Road Grid Texture */}
+                <div className="dhaka-map-texture" style={{ opacity: mapMode === 'street' ? 0.85 : 0.4 }} />
 
-                {/* Radar Concentric Rings */}
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '70px', height: '70px', border: '1px solid rgba(201, 114, 45, 0.25)', borderRadius: '50%' }} />
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '120px', height: '120px', border: '1px solid rgba(201, 114, 45, 0.15)', borderRadius: '50%' }} />
+                {/* Street Mode Vector Road Lines */}
+                {mapMode === 'street' && (
+                  <svg
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', opacity: 0.35 }}
+                  >
+                    <line x1="0%" y1="50%" x2="100%" y2="50%" stroke="rgba(201, 114, 45, 0.4)" strokeWidth="3" />
+                    <line x1="50%" y1="0%" x2="50%" y2="100%" stroke="rgba(201, 114, 45, 0.4)" strokeWidth="3" />
+                    <line x1="20%" y1="0%" x2="80%" y2="100%" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1.5" />
+                    <line x1="0%" y1="25%" x2="100%" y2="75%" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1.5" />
+                    <circle cx="50%" cy="50%" r="40" fill="none" stroke="rgba(201, 114, 45, 0.2)" strokeWidth="1" strokeDasharray="3,3" />
+                    <circle cx="50%" cy="50%" r="80" fill="none" stroke="rgba(201, 114, 45, 0.15)" strokeWidth="1" strokeDasharray="3,3" />
+                  </svg>
+                )}
+
+                {/* Radar Mode Rotating Sonar Sweep */}
+                {mapMode === 'radar' && (
+                  <>
+                    <div className="dhaka-radar-dial">
+                      <div className="dhaka-radar-beam" />
+                    </div>
+                    {/* Concentric Sonar Distance Rings */}
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '80px', height: '80px', border: '1px solid rgba(201, 114, 45, 0.3)', borderRadius: '50%', pointerEvents: 'none' }} />
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '150px', height: '150px', border: '1px solid rgba(201, 114, 45, 0.15)', borderRadius: '50%', pointerEvents: 'none' }} />
+                  </>
+                )}
+
+                {/* Top Control Bar: Mode Toggle & Zoom Controls */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    left: '8px',
+                    right: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    zIndex: 20,
+                  }}
+                >
+                  {/* Mode Switcher */}
+                  <div
+                    style={{
+                      background: 'rgba(20, 18, 15, 0.9)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      padding: '2px',
+                      gap: '2px',
+                    }}
+                  >
+                    <button
+                      onClick={() => setMapMode('radar')}
+                      style={{
+                        background: mapMode === 'radar' ? 'var(--brand-primary)' : 'transparent',
+                        color: mapMode === 'radar' ? '#fff' : 'var(--text-muted)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.62rem',
+                        fontFamily: 'Space Grotesk',
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🛰️ Sonar
+                    </button>
+                    <button
+                      onClick={() => setMapMode('street')}
+                      style={{
+                        background: mapMode === 'street' ? 'var(--brand-primary)' : 'transparent',
+                        color: mapMode === 'street' ? '#fff' : 'var(--text-muted)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.62rem',
+                        fontFamily: 'Space Grotesk',
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🗺️ Map
+                    </button>
+                  </div>
+
+                  {/* Zoom In / Out / Re-center Buttons */}
+                  <div
+                    style={{
+                      background: 'rgba(20, 18, 15, 0.9)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      padding: '2px 4px',
+                    }}
+                  >
+                    <button
+                      onClick={() => setMapZoom((prev) => Math.min(2.2, prev + 0.35))}
+                      title="Zoom In"
+                      style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px' }}
+                    >
+                      <ZoomIn size={12} />
+                    </button>
+                    <span style={{ fontSize: '0.6rem', color: 'var(--brand-primary)', fontFamily: 'Space Grotesk', fontWeight: 700, padding: '0 2px' }}>
+                      {mapZoom <= 0.7 ? '5km' : mapZoom <= 1.3 ? '2km' : '800m'}
+                    </span>
+                    <button
+                      onClick={() => setMapZoom((prev) => Math.max(0.4, prev - 0.35))}
+                      title="Zoom Out"
+                      style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px' }}
+                    >
+                      <ZoomOut size={12} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMapZoom(1);
+                        setSelectedMapListing(null);
+                      }}
+                      title="Re-center Map"
+                      style={{ background: 'none', border: 'none', color: 'var(--brand-primary)', cursor: 'pointer', padding: '2px', marginLeft: '2px' }}
+                    >
+                      <Navigation size={11} />
+                    </button>
+                  </div>
+                </div>
 
                 {/* User Center Coordinate Pin */}
                 <div
@@ -652,37 +813,200 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: '10px',
-                    height: '10px',
-                    background: 'var(--brand-primary)',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 12px var(--brand-primary)',
-                    zIndex: 10,
-                  }}
-                />
-
-                {/* Property Pin Markers */}
-                <div style={{ position: 'absolute', top: '32%', left: '28%', width: '8px', height: '8px', background: '#9fe3c2', borderRadius: '50%', boxShadow: '0 0 6px rgba(159, 227, 194, 0.6)' }} title="Block C" />
-                <div style={{ position: 'absolute', top: '60%', left: '72%', width: '8px', height: '8px', background: '#9fe3c2', borderRadius: '50%', boxShadow: '0 0 6px rgba(159, 227, 194, 0.6)' }} title="Block D" />
-                <div style={{ position: 'absolute', top: '24%', left: '68%', width: '8px', height: '8px', background: '#f6cd8b', borderRadius: '50%', boxShadow: '0 0 6px rgba(246, 205, 139, 0.6)' }} title="Saidnagar" />
-
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '8px',
-                    left: '8px',
-                    fontSize: '0.68rem',
-                    fontFamily: 'Space Grotesk',
-                    fontWeight: 700,
-                    color: 'var(--brand-primary)',
-                    background: 'rgba(20, 18, 15, 0.85)',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-subtle)',
+                    zIndex: 15,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    pointerEvents: 'none',
                   }}
                 >
-                  {nearbyListings.length} Units Located
+                  <div
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      background: 'var(--brand-primary)',
+                      borderRadius: '50%',
+                      boxShadow: '0 0 14px var(--brand-primary), 0 0 0 4px rgba(201, 114, 45, 0.3)',
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '0.58rem',
+                      fontFamily: 'Space Grotesk',
+                      fontWeight: 800,
+                      color: '#fff',
+                      background: 'rgba(20, 18, 15, 0.9)',
+                      padding: '1px 4px',
+                      borderRadius: '3px',
+                      marginTop: '2px',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    📍 You
+                  </span>
                 </div>
+
+                {/* Dynamic Relative Listing Pins on Real Map */}
+                {listingsWithDistance.map((item) => {
+                  const pos = calculatePinPosition(item.location?.coordinates);
+                  if (!pos.isVisible) return null;
+
+                  const isSelected = selectedMapListing?._id === item._id;
+                  const isSeat = item.rentalCategory === 'seat' || item.propertyType === 'seat_rent';
+                  const isDining = item.rentalCategory === 'dining_space' || item.propertyType === 'dining_space';
+                  const isFlat = item.rentalCategory === 'full_flat' || item.propertyType === 'full_flat';
+
+                  const badgeColor = isSeat ? '#9fe3c2' : isDining ? '#f6cd8b' : isFlat ? '#93c5fd' : '#f6f3ee';
+                  const badgeBg = isSelected
+                    ? 'var(--brand-primary)'
+                    : isSeat
+                    ? '#1f3a2c'
+                    : isDining
+                    ? '#382a18'
+                    : '#221e1a';
+
+                  return (
+                    <div
+                      key={item._id}
+                      onClick={() => setSelectedMapListing(item)}
+                      style={{
+                        position: 'absolute',
+                        left: `${pos.x}%`,
+                        top: `${pos.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                        zIndex: isSelected ? 25 : 12,
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                      title={`${item.title} (৳${item.rentAmount.toLocaleString()})`}
+                    >
+                      <div
+                        style={{
+                          background: badgeBg,
+                          border: `1px solid ${isSelected ? '#fff' : 'rgba(201, 114, 45, 0.4)'}`,
+                          borderRadius: '12px',
+                          padding: '2px 5px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          boxShadow: isSelected
+                            ? '0 0 14px var(--brand-primary)'
+                            : '0 2px 8px rgba(0,0,0,0.6)',
+                          transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.62rem' }}>
+                          {isSeat ? '🛏️' : isDining ? '🍽️' : isFlat ? '🏢' : '🚪'}
+                        </span>
+                        <span
+                          className="font-mono"
+                          style={{
+                            fontSize: '0.62rem',
+                            fontWeight: 800,
+                            color: isSelected ? '#fff' : badgeColor,
+                          }}
+                        >
+                          ৳{(item.rentAmount / 1000).toFixed(1)}k
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Floating Map Pin Preview Card (When Pin Clicked) */}
+                {selectedMapListing && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '6px',
+                      left: '6px',
+                      right: '6px',
+                      background: 'rgba(20, 18, 15, 0.95)',
+                      border: '1px solid var(--brand-primary-border)',
+                      borderRadius: '10px',
+                      padding: '8px',
+                      display: 'flex',
+                      gap: '8px',
+                      alignItems: 'center',
+                      zIndex: 30,
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.85)',
+                      animation: 'messageSlideIn 0.2s ease forwards',
+                    }}
+                  >
+                    <img
+                      src={selectedMapListing.images[0]}
+                      alt={selectedMapListing.title}
+                      style={{ width: '44px', height: '44px', borderRadius: '6px', objectFit: 'cover' }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                          <span className="taka-symbol">৳</span>{selectedMapListing.rentAmount.toLocaleString()}
+                        </span>
+                        <span style={{ fontSize: '0.62rem', color: '#9fe3c2', fontFamily: 'Space Grotesk', fontWeight: 700 }}>
+                          📍 {selectedMapListing.distanceStr}
+                        </span>
+                      </div>
+                      <h5 style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff', margin: '2px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {selectedMapListing.title}
+                      </h5>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button
+                        onClick={() => handleStartCall(selectedMapListing)}
+                        style={{
+                          background: 'var(--bg-surface-3)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--brand-primary)',
+                          borderRadius: '6px',
+                          padding: '5px',
+                          cursor: 'pointer',
+                        }}
+                        title="Call Host"
+                      >
+                        <PhoneCall size={12} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedListing(selectedMapListing);
+                          setSelectedMapListing(null);
+                        }}
+                        className="btn-terracotta"
+                        style={{ fontSize: '0.66rem', padding: '4px 8px', borderRadius: '6px' }}
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => setSelectedMapListing(null)}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer', padding: '2px' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Scan Radius & Density Indicator */}
+                {!selectedMapListing && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '6px',
+                      left: '8px',
+                      fontSize: '0.64rem',
+                      fontFamily: 'Space Grotesk',
+                      fontWeight: 700,
+                      color: 'var(--brand-primary)',
+                      background: 'rgba(20, 18, 15, 0.85)',
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    📍 {listingsWithDistance.filter((l) => calculatePinPosition(l.location?.coordinates).isVisible).length} Units in Scan Radius
+                  </div>
+                )}
               </div>
 
               {/* Asymmetric Nearest Feed (Top Card Featured) */}
