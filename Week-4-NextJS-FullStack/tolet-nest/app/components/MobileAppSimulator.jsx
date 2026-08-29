@@ -269,7 +269,9 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
               {/* Architectural Dhaka Map Radar Texture */}
               <div className="dhaka-radar-container" style={{ height: '145px', marginBottom: '14px' }}>
                 <div className="dhaka-map-texture" />
-                <div className="dhaka-radar-sweep" />
+                <div className="dhaka-radar-dial">
+                  <div className="dhaka-radar-beam" />
+                </div>
 
                 {/* Radar Concentric Rings */}
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '70px', height: '70px', border: '1px solid rgba(201, 114, 45, 0.25)', borderRadius: '50%' }} />
