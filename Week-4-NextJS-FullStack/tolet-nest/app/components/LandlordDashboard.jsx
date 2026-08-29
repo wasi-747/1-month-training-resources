@@ -1,39 +1,35 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Building,
   PlusCircle,
-  Eye,
-  CheckCircle,
-  Clock,
-  Phone,
-  MessageSquare,
   Shield,
   Trash2,
-  Zap,
+  RefreshCw,
+  MapPin,
   Flame,
+  Zap,
   Droplet,
   Wifi,
-  Sparkles,
-  RefreshCw,
-  Home,
-  MapPin,
-  Users,
-  DollarSign
+  DollarSign,
+  Phone,
+  MessageSquare,
+  CheckCircle2,
+  AlertCircle,
+  Sliders
 } from 'lucide-react';
 
 export default function LandlordDashboard({ listings, onRefresh, onPostListing, onUpdateStatus, onDeleteListing }) {
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'inquiries' | 'analytics'
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'inquiries'
   const [replyText, setReplyText] = useState('');
 
   // New Listing Form State
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    rentAmount: 8000,
+    rentAmount: 8500,
     area: 'Bashundhara R/A',
     addressText: '',
     propertyType: 'single_room',
@@ -41,9 +37,9 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
     utilityMode: 'itemized', // 'itemized' | 'inclusive' | 'contact'
     utilityBreakdown: {
       electricity: 500,
-      gas: 200,
+      gas: 250,
       water: 150,
-      serviceCharge: 200,
+      serviceCharge: 250,
       wifi: 150,
       waste: 50,
     },
@@ -55,14 +51,14 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
   });
 
   const amenitiesList = [
-    { id: 'attached_bath', label: 'Attached Bath 🚿' },
-    { id: 'balcony', label: 'Private Balcony 🌿' },
-    { id: 'wifi', label: 'High-Speed WiFi 📶' },
-    { id: 'lift', label: 'Elevator / Lift 🛗' },
-    { id: 'generator', label: 'Generator Backup ⚡' },
-    { id: 'gas', label: '24/7 Gas Line 🔥' },
-    { id: 'no_curfew', label: 'No Night Curfew 🌙' },
-    { id: 'meal_system', label: 'Maid / Meal System 🍲' },
+    { id: 'attached_bath', label: 'Attached Bath' },
+    { id: 'balcony', label: 'Private Balcony' },
+    { id: 'wifi', label: 'Optic Fiber WiFi' },
+    { id: 'lift', label: 'Elevator / Lift' },
+    { id: 'generator', label: 'Generator Backup' },
+    { id: 'gas', label: '24/7 Gas Line' },
+    { id: 'no_curfew', label: 'No Night Curfew' },
+    { id: 'meal_system', label: 'Shared Meal System' },
   ];
 
   const handleAmenityToggle = (id) => {
@@ -105,7 +101,7 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title || !formData.addressText) {
-      alert('Please fill out the Title and Address');
+      alert('Please provide the listing title and specific address');
       return;
     }
 
@@ -136,7 +132,6 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
 
     onPostListing(payload);
     setShowModal(false);
-    // Reset form
     setFormData((prev) => ({
       ...prev,
       title: '',
@@ -153,132 +148,140 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
     totalCount > 0 ? Math.round(listings.reduce((sum, l) => sum + l.rentAmount, 0) / totalCount) : 0;
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1100px' }}>
       {/* Top Header */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           flexWrap: 'wrap',
           gap: '16px',
-          marginBottom: '24px',
+          marginBottom: '22px',
         }}
       >
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Building style={{ color: 'var(--brand-cyan)' }} />
-            Landlord & Property Manager Portal
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Management Portal
+            </span>
+          </div>
+          <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#fff' }}>
+            Landlord & Property Manager
           </h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Post To-Lets, manage itemized utility costs, and respond to privacy-protected student inquiries.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '4px' }}>
+            Post To-Lets, configure transparent utility costs, and manage privacy-protected tenant inquiries.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onRefresh} className="btn-secondary" title="Refresh Live Database">
-            <RefreshCw size={16} /> Sync
+          <button onClick={onRefresh} className="btn-surface" title="Refresh Live Database">
+            <RefreshCw size={14} style={{ color: 'var(--brand-primary)' }} /> Sync
           </button>
-          <button onClick={() => setShowModal(true)} className="btn-emerald">
-            <PlusCircle size={18} /> Post New To-Let
+          <button onClick={() => setShowModal(true)} className="btn-terracotta">
+            <PlusCircle size={16} /> Post To-Let
           </button>
         </div>
       </div>
 
-      {/* KPI Stats Overview */}
+      {/* KPI Overview Grid with Varied Visual Weight */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '14px',
           marginBottom: '24px',
         }}
       >
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>
-            TOTAL PROPERTIES
+        <div className="card-surface" style={{ padding: '18px' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Total Units
           </span>
-          <p style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginTop: '6px' }}>
-            {totalCount} Units
+          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', marginTop: '4px' }}>
+            {totalCount}
           </p>
-          <span style={{ color: 'var(--brand-cyan)', fontSize: '0.8rem' }}>Managed across Dhaka</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Listed across Dhaka</span>
         </div>
 
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>
-            AVAILABLE FOR RENT
+        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid var(--brand-sage)' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Vacant & Available
           </span>
-          <p style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-emerald)', marginTop: '6px' }}>
-            {availableCount} Vacant
+          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-available-text)', marginTop: '4px' }}>
+            {availableCount}
           </p>
-          <span style={{ color: 'var(--brand-emerald)', fontSize: '0.8rem' }}>Ready for move-in</span>
+          <span style={{ color: 'var(--brand-sage)', fontSize: '0.75rem' }}>Ready for move-in</span>
         </div>
 
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>
-            RENTED / OCCUPIED
+        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid #7c352d' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Rented / Occupied
           </span>
-          <p style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-rose)', marginTop: '6px' }}>
-            {rentedCount} Rented
+          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-rented-text)', marginTop: '4px' }}>
+            {rentedCount}
           </p>
-          <span style={{ color: 'var(--brand-rose)', fontSize: '0.8rem' }}>Inquiries paused</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Inquiries paused</span>
         </div>
 
-        <div className="glass-card" style={{ padding: '20px' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>
-            AVG BASE RENT
+        <div className="card-surface-elevated" style={{ padding: '18px', borderLeft: '3px solid var(--brand-primary)' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Average Base Rent
           </span>
-          <p style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-amber)', marginTop: '6px' }}>
-            ৳{avgRent.toLocaleString()}
+          <p className="font-heading font-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-primary)', marginTop: '4px' }}>
+            <span className="taka-symbol">৳</span>{avgRent.toLocaleString()}
           </p>
-          <span style={{ color: 'var(--brand-amber)', fontSize: '0.8rem' }}>Excluding utilities</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Excluding utilities</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '18px' }}>
         <button
           onClick={() => setActiveTab('listings')}
           style={{
             background: 'none',
             border: 'none',
-            padding: '10px 18px',
-            color: activeTab === 'listings' ? 'var(--brand-cyan)' : 'var(--text-secondary)',
+            padding: '10px 16px',
+            color: activeTab === 'listings' ? 'var(--brand-primary)' : 'var(--text-secondary)',
+            fontFamily: 'Space Grotesk, sans-serif',
             fontWeight: 700,
-            borderBottom: activeTab === 'listings' ? '2px solid var(--brand-cyan)' : 'none',
+            fontSize: '0.88rem',
+            borderBottom: activeTab === 'listings' ? '2px solid var(--brand-primary)' : '2px solid transparent',
             cursor: 'pointer',
           }}
         >
-          📋 Active Listings ({listings.length})
+          Active Listings ({listings.length})
         </button>
         <button
           onClick={() => setActiveTab('inquiries')}
           style={{
             background: 'none',
             border: 'none',
-            padding: '10px 18px',
-            color: activeTab === 'inquiries' ? 'var(--brand-cyan)' : 'var(--text-secondary)',
+            padding: '10px 16px',
+            color: activeTab === 'inquiries' ? 'var(--brand-primary)' : 'var(--text-secondary)',
+            fontFamily: 'Space Grotesk, sans-serif',
             fontWeight: 700,
-            borderBottom: activeTab === 'inquiries' ? '2px solid var(--brand-cyan)' : 'none',
+            fontSize: '0.88rem',
+            borderBottom: activeTab === 'inquiries' ? '2px solid var(--brand-primary)' : '2px solid transparent',
             cursor: 'pointer',
           }}
         >
-          💬 Student Inquiries & Calls
+          Tenant Inquiries & Call Logs
         </button>
       </div>
 
       {/* Tab 1: Listings Table */}
       {activeTab === 'listings' && (
-        <div className="glass-card" style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+        <div className="card-surface" style={{ overflowX: 'auto', borderRadius: '12px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
             <thead>
-              <tr style={{ background: 'rgba(15, 23, 42, 0.6)', borderBottom: '1px solid var(--border-subtle)' }}>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>Property Details</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>Area & Type</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>Base Rent</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>Utility Cost</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)' }}>Status</th>
-                <th style={{ padding: '14px 18px', color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
+              <tr style={{ background: 'var(--bg-surface-2)', borderBottom: '1px solid var(--border-subtle)' }}>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Property Details</th>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Area & Type</th>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Base Rent</th>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Utility Charges</th>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</th>
+                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -286,51 +289,51 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                 <tr
                   key={item._id}
                   style={{
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                    transition: 'background 0.2s',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    transition: 'background 0.15s ease',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(30, 41, 59, 0.4)')}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-2)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <td style={{ padding: '16px 18px', maxWidth: '300px' }}>
-                    <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem' }}>{item.title}</p>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '3px' }}>
-                      📍 {item.addressText}
+                  <td style={{ padding: '14px 16px', maxWidth: '280px' }}>
+                    <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.92rem' }}>{item.title}</p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <MapPin size={12} style={{ color: 'var(--brand-primary)' }} /> {item.addressText}
                     </p>
                   </td>
-                  <td style={{ padding: '16px 18px' }}>
-                    <p style={{ fontWeight: 600, color: 'var(--brand-cyan)' }}>{item.area}</p>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'capitalize' }}>
+                  <td style={{ padding: '14px 16px' }}>
+                    <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>{item.area}</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.76rem', textTransform: 'capitalize' }}>
                       {item.propertyType.replace('_', ' ')} • {item.tenantType.replace('_', ' ')}
                     </p>
                   </td>
-                  <td style={{ padding: '16px 18px', fontWeight: 700, color: 'var(--brand-emerald)' }}>
-                    ৳{item.rentAmount.toLocaleString()}
+                  <td style={{ padding: '14px 16px', fontWeight: 700, color: '#fff' }} className="font-mono">
+                    <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
                   </td>
-                  <td style={{ padding: '16px 18px' }}>
+                  <td style={{ padding: '14px 16px' }}>
                     {item.utilityInfo?.mode === 'itemized' && (
                       <div>
-                        <span style={{ fontWeight: 700, color: 'var(--brand-amber)' }}>
-                          +৳{(item.utilityInfo.totalUtility || 0).toLocaleString()}
+                        <span className="font-mono" style={{ fontWeight: 700, color: 'var(--brand-primary)', fontSize: '0.85rem' }}>
+                          +<span className="taka-symbol">৳</span>{(item.utilityInfo.totalUtility || 0).toLocaleString()}
                         </span>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Itemized Breakdown</p>
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Itemized</p>
                       </div>
                     )}
                     {item.utilityInfo?.mode === 'inclusive' && (
-                      <span style={{ color: 'var(--brand-cyan)', fontSize: '0.85rem', fontWeight: 600 }}>
-                        +৳{(item.utilityInfo.totalUtility || 0).toLocaleString()} (Inclusive)
+                      <span className="font-mono" style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 600 }}>
+                        +<span className="taka-symbol">৳</span>{(item.utilityInfo.totalUtility || 0).toLocaleString()} (Fixed)
                       </span>
                     )}
                     {item.utilityInfo?.mode === 'contact' && (
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Contact for bill</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Negotiable</span>
                     )}
                   </td>
-                  <td style={{ padding: '16px 18px' }}>
-                    {item.status === 'available' && <span className="badge-available">🟢 Available</span>}
-                    {item.status === 'visit_scheduled' && <span className="badge-scheduled">🟡 Visit Booked</span>}
-                    {item.status === 'rented' && <span className="badge-rented">🔴 Rented</span>}
+                  <td style={{ padding: '14px 16px' }}>
+                    {item.status === 'available' && <span className="status-chip status-chip-available">● Available</span>}
+                    {item.status === 'visit_scheduled' && <span className="status-chip status-chip-scheduled">● Visit Booked</span>}
+                    {item.status === 'rented' && <span className="status-chip status-chip-rented">● Rented</span>}
                   </td>
-                  <td style={{ padding: '16px 18px', textAlign: 'right' }}>
+                  <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '8px' }}>
                       <button
                         onClick={() =>
@@ -339,19 +342,18 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                             item.status === 'available' ? 'rented' : 'available'
                           )
                         }
-                        className="btn-secondary"
-                        style={{ fontSize: '0.8rem', padding: '5px 10px' }}
-                        title="Toggle Available vs Rented"
+                        className="btn-surface"
+                        style={{ fontSize: '0.75rem', padding: '4px 10px' }}
                       >
-                        {item.status === 'available' ? 'Mark Rented 🔴' : 'Mark Available 🟢'}
+                        {item.status === 'available' ? 'Set Rented' : 'Set Available'}
                       </button>
                       <button
                         onClick={() => onDeleteListing(item._id)}
-                        className="btn-danger"
-                        style={{ padding: '5px 8px' }}
-                        title="Delete Listing"
+                        className="btn-danger-subtle"
+                        style={{ padding: '4px 8px' }}
+                        title="Delete listing"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
                       </button>
                     </div>
                   </td>
@@ -364,70 +366,72 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
 
       {/* Tab 2: Inquiries Inbox */}
       {activeTab === 'inquiries' && (
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={18} style={{ color: 'var(--brand-emerald)' }} />
-            Privacy-Protected In-App Inquiries Inbox
-          </h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
-            Tenants contact you directly through the secure in-app channel. Phone numbers are hidden by default unless you choose to display public contact.
+        <div className="card-surface" style={{ padding: '22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <Shield size={18} style={{ color: 'var(--brand-sage)' }} />
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff' }}>
+              Privacy-Preserving Inquiry Inbox
+            </h3>
+          </div>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '18px' }}>
+            Incoming messages from verified student tenants in Dhaka. Personal phone numbers remain masked to prevent spam.
           </p>
 
           <div
             style={{
-              background: '#0f172a',
+              background: 'var(--bg-surface-2)',
               border: '1px solid var(--border-subtle)',
-              borderRadius: '12px',
+              borderRadius: '10px',
               padding: '16px',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '10px' }}>
               <div>
-                <span style={{ fontWeight: 700, color: '#fff' }}>Student Tenant: Wasiur Rahman</span>
-                <p style={{ fontSize: '0.8rem', color: 'var(--brand-cyan)' }}>
-                  Listing: Bachelor Master Bed with Attached Bath & Balcony (Bashundhara R/A)
+                <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.92rem' }}>Wasiur Rahman (Student Tenant)</span>
+                <p style={{ fontSize: '0.76rem', color: 'var(--brand-primary)', marginTop: '2px' }}>
+                  Inquiry on: Bachelor Master Bed (Bashundhara R/A Block C)
                 </p>
               </div>
-              <span className="badge-available">🟢 Active Inquiry</span>
+              <span className="status-chip status-chip-available">● Active Thread</span>
             </div>
 
             {/* Simulated Chat Messages */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', margin: '16px 0', maxHeight: '220px', overflowY: 'auto' }}>
-              <div style={{ alignSelf: 'flex-start', background: '#1e293b', padding: '10px 14px', borderRadius: '12px', maxWidth: '75%', fontSize: '0.88rem' }}>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', margin: '14px 0', maxHeight: '200px', overflowY: 'auto' }}>
+              <div className="animate-message" style={{ alignSelf: 'flex-start', background: 'var(--bg-surface-3)', border: '1px solid var(--border-subtle)', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
                 Assalamu Alaikum Uncle, is the master bed room still available for September?
               </div>
 
-              <div style={{ alignSelf: 'flex-end', background: '#0284c7', color: '#fff', padding: '10px 14px', borderRadius: '12px', maxWidth: '75%', fontSize: '0.88rem' }}>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', marginBottom: '2px' }}>You (Landlord)</p>
+              <div className="animate-message" style={{ alignSelf: 'flex-end', background: 'var(--brand-primary)', color: '#fff', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', marginBottom: '2px' }}>You (Landlord)</p>
                 Walaikum Assalam. Yes Baba, it is available. Are you studying at NSU?
               </div>
 
-              <div style={{ alignSelf: 'flex-start', background: '#1e293b', padding: '10px 14px', borderRadius: '12px', maxWidth: '75%', fontSize: '0.88rem' }}>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
+              <div className="animate-message" style={{ alignSelf: 'flex-start', background: 'var(--bg-surface-3)', border: '1px solid var(--border-subtle)', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
                 Yes Uncle, I am in my final semester. Is night entry allowed after 11 PM for lab projects?
               </div>
 
-              <div style={{ alignSelf: 'center', background: 'rgba(52, 211, 153, 0.1)', color: 'var(--brand-emerald)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.78rem', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
-                📞 In-App Voice Call Completed (1 min 34 sec) • Zero Phone Number Leak
+              <div style={{ alignSelf: 'center', background: 'var(--brand-sage-subtle)', color: 'var(--status-available-text)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', border: '1px solid var(--status-available-border)' }}>
+                📞 In-App Voice Call Completed (1m 34s) • Zero Phone Number Exposure
               </div>
             </div>
 
             {/* Quick Reply Bar */}
-            <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
               <input
                 type="text"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Type in-app reply to tenant..."
+                placeholder="Type in-app reply to student..."
                 style={{
                   flex: 1,
-                  background: '#1e293b',
-                  border: '1px solid #334155',
+                  background: 'var(--bg-main)',
+                  border: '1px solid var(--border-subtle)',
                   color: '#fff',
-                  padding: '10px 14px',
+                  padding: '9px 12px',
                   borderRadius: '8px',
-                  fontSize: '0.9rem',
+                  fontSize: '0.85rem',
                 }}
               />
               <button
@@ -437,7 +441,7 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                     setReplyText('');
                   }
                 }}
-                className="btn-primary"
+                className="btn-terracotta"
               >
                 Send Reply
               </button>
@@ -446,61 +450,32 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
         </div>
       )}
 
-      {/* Modal: 1-Minute Smart Listing Creation Form */}
+      {/* Modal: 1-Minute Smart Listing Form */}
       {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '20px',
-          }}
-        >
-          <div
-            className="glass-modal"
-            style={{
-              width: '100%',
-              maxWidth: '750px',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              padding: '28px',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+          <div className="glass-modal" style={{ width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', padding: '26px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
               <div>
-                <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
-                  📝 Post New To-Let (1-Minute Smart Form)
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
+                  Post New To-Let
                 </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                  Define transparent base rent, itemized utility charges, and student preferences.
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                  Provide clear base rent, transparent utility breakdown, and student criteria.
                 </p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                style={{
-                  background: '#1e293b',
-                  border: 'none',
-                  color: '#94a3b8',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  fontSize: '1.1rem',
-                }}
+                style={{ background: 'var(--bg-surface-2)', border: 'none', color: 'var(--text-muted)', width: '30px', height: '30px', borderRadius: '50%', cursor: 'pointer' }}
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Title & Area */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
                     Listing Title *
                   </label>
                   <input
@@ -509,17 +484,17 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                     placeholder="e.g. Master Bed with Attached Bath near NSU Gate 2"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                    Area / Location *
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                    Dhaka Area *
                   </label>
                   <select
                     value={formData.area}
                     onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                    style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
                   >
                     <option value="Bashundhara R/A">Bashundhara R/A</option>
                     <option value="Saidnagar">Saidnagar</option>
@@ -534,29 +509,29 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
 
               {/* Exact Address */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                  Specific Address / Road / Landmark *
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                  Specific Address / Landmark *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. House 14, Road 4, Block C, Bashundhara R/A"
+                  placeholder="e.g. Road 4, Block C, Bashundhara (Near Gate 2)"
                   value={formData.addressText}
                   onChange={(e) => setFormData({ ...formData, addressText: e.target.value })}
-                  style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                  style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
                 />
               </div>
 
-              {/* Property & Tenant Type */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              {/* Room & Tenant Type */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                    Room / Property Type
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                    Room / Accommodation Type
                   </label>
                   <select
                     value={formData.propertyType}
                     onChange={(e) => setFormData({ ...formData, propertyType: e.target.value })}
-                    style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px' }}
                   >
                     <option value="single_room">Single Private Room</option>
                     <option value="master_bed">Master Bed (Attached Bath)</option>
@@ -566,35 +541,28 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
                     Preferred Tenant
                   </label>
                   <select
                     value={formData.tenantType}
                     onChange={(e) => setFormData({ ...formData, tenantType: e.target.value })}
-                    style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px' }}
                   >
-                    <option value="bachelor_male">Bachelor Male (Students/Job)</option>
-                    <option value="bachelor_female">Bachelor Female (Students/Job)</option>
-                    <option value="student_only">Students Only</option>
+                    <option value="bachelor_male">Bachelor Male</option>
+                    <option value="bachelor_female">Bachelor Female</option>
+                    <option value="student_only">Student Only</option>
                     <option value="family">Family Only</option>
-                    <option value="any">Any / Open to All</option>
+                    <option value="any">Open to All</option>
                   </select>
                 </div>
               </div>
 
-              {/* Pricing Section (Base Rent + Transparent Utility Breakdown) */}
-              <div
-                style={{
-                  background: 'rgba(30, 41, 59, 0.4)',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid var(--border-subtle)',
-                }}
-              >
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '12px' }}>
+              {/* Pricing & Utility Mode */}
+              <div style={{ background: 'var(--bg-surface-2)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-emerald)', marginBottom: '6px' }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--brand-primary)', marginBottom: '5px' }}>
                       Monthly Base Rent (BDT ৳) *
                     </label>
                     <input
@@ -603,101 +571,98 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                       min="1000"
                       value={formData.rentAmount}
                       onChange={(e) => setFormData({ ...formData, rentAmount: e.target.value })}
-                      style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: 700 }}
+                      style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '8px', fontSize: '1rem', fontWeight: 700 }}
                     />
                   </div>
-
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-amber)', marginBottom: '6px' }}>
-                      Utility & Bills Mode
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                      Utility Bills Structure
                     </label>
                     <select
                       value={formData.utilityMode}
                       onChange={(e) => setFormData({ ...formData, utilityMode: e.target.value })}
-                      style={{ width: '100%', background: '#0f172a', border: '1px solid var(--border-subtle)', color: '#fff', padding: '10px', borderRadius: '8px' }}
+                      style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '8px' }}
                     >
-                      <option value="itemized">Option A: Itemized Bill Breakdown</option>
-                      <option value="inclusive">Option B: All-Inclusive Fixed Bundle</option>
-                      <option value="contact">Option C: Contact for Bills (Shared Meter)</option>
+                      <option value="itemized">Itemized Breakdown (Transparent)</option>
+                      <option value="inclusive">Fixed Inclusive Bundle</option>
+                      <option value="contact">Contact for Bills</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Itemized Breakdown Inputs */}
                 {formData.utilityMode === 'itemized' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '10px' }}>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>⚡ Electricity (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Electricity (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.electricity}
                         onChange={(e) => handleUtilityChange('electricity', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>🔥 Gas (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Gas (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.gas}
                         onChange={(e) => handleUtilityChange('gas', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>💧 Water (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Water (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.water}
                         onChange={(e) => handleUtilityChange('water', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>🏢 Service Charge (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Service Charge (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.serviceCharge}
                         onChange={(e) => handleUtilityChange('serviceCharge', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>📶 WiFi (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>WiFi (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.wifi}
                         onChange={(e) => handleUtilityChange('wifi', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                     <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>🗑️ Waste Bill (৳)</span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Waste (৳)</span>
                       <input
                         type="number"
                         value={formData.utilityBreakdown.waste}
                         onChange={(e) => handleUtilityChange('waste', e.target.value)}
-                        style={{ width: '100%', background: '#0f172a', border: '1px solid #334155', color: '#fff', padding: '6px 8px', borderRadius: '6px' }}
+                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
                       />
                     </div>
                   </div>
                 )}
 
-                {/* Total Calculated Estimate */}
-                <div style={{ marginTop: '12px', padding: '10px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#fff' }}>💡 Total Monthly Cost Estimate for Tenant:</span>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--brand-cyan)' }}>
-                    ৳{(Number(formData.rentAmount) + calculateTotalUtility()).toLocaleString()}/mo
+                <div style={{ marginTop: '10px', padding: '8px 12px', background: 'var(--brand-primary-subtle)', border: '1px solid var(--brand-primary-border)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#fff' }}>Total Estimated Cost for Tenant:</span>
+                  <span className="font-mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                    <span className="taka-symbol">৳</span>{(Number(formData.rentAmount) + calculateTotalUtility()).toLocaleString()}/mo
                   </span>
                 </div>
               </div>
 
-              {/* Amenities Selector */}
+              {/* Amenities */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                  Included Amenities & House Rules
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Amenities & House Rules
                 </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {amenitiesList.map((item) => {
                     const isSelected = formData.amenities.includes(item.id);
                     return (
@@ -706,15 +671,15 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                         key={item.id}
                         onClick={() => handleAmenityToggle(item.id)}
                         style={{
-                          background: isSelected ? 'var(--brand-cyan)' : '#1e293b',
-                          color: isSelected ? '#000' : 'var(--text-secondary)',
-                          border: '1px solid ' + (isSelected ? 'var(--brand-cyan)' : '#334155'),
-                          padding: '6px 12px',
-                          borderRadius: '20px',
-                          fontSize: '0.82rem',
+                          background: isSelected ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                          color: isSelected ? '#fff' : 'var(--text-secondary)',
+                          border: '1px solid ' + (isSelected ? 'var(--brand-primary)' : 'var(--border-subtle)'),
+                          padding: '5px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontFamily: 'Space Grotesk, sans-serif',
                           fontWeight: 600,
                           cursor: 'pointer',
-                          transition: 'all 0.2s',
                         }}
                       >
                         {item.label}
@@ -725,12 +690,12 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
               </div>
 
               {/* Submit Buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '10px' }}>
-                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary">
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn-surface">
                   Cancel
                 </button>
-                <button type="submit" className="btn-emerald">
-                  <CheckCircle size={18} /> Publish To-Let Now
+                <button type="submit" className="btn-terracotta">
+                  <CheckCircle2 size={16} /> Publish Listing
                 </button>
               </div>
             </form>

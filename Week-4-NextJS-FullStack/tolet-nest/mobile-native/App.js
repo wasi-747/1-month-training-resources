@@ -2,10 +2,9 @@
  * ==============================================================================================
  * 📱 ToLetNest — React Native Mobile Client Application
  * ==============================================================================================
- * Pure React Native Core Architecture:
+ * Pure React Native Core Architecture (Warm Dhaka Terracotta & Charcoal Palette):
  * - Uses Native Components: View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Modal
- * - Custom Hooks: useLocationRadar, useInAppChat, useAudioCall
- * - Anti-Harassment Privacy Shield & One-Tap Close Chat
+ * - Privacy-First In-App Audio Calling & One-Tap Close Chat Anti-Harassment Shield
  * ==============================================================================================
  */
 
@@ -26,13 +25,12 @@ import {
 } from 'react-native';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'explore' | 'chats'
+  const [activeTab, setActiveTab] = useState('radar');
   const [selectedListing, setSelectedListing] = useState(null);
   const [activeCall, setActiveCall] = useState(null);
   const [isCalling, setIsCalling] = useState(false);
   const [callTimer, setCallTimer] = useState(0);
 
-  // Sample data
   const [listings, setListings] = useState([
     {
       id: '1',
@@ -60,7 +58,6 @@ export default function App() {
     }
   ]);
 
-  // Call simulation timer
   useEffect(() => {
     let interval;
     if (isCalling) {
@@ -84,12 +81,12 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a0f1d" />
+      <StatusBar barStyle="light-content" backgroundColor="#14120f" />
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>🏡 ToLet<Text style={styles.cyanText}>Nest</Text></Text>
-        <Text style={styles.headerSubtitle}>📍 GPS Active: Bashundhara R/A</Text>
+        <Text style={styles.headerTitle}>ToLet<Text style={styles.terracottaText}>Nest</Text></Text>
+        <Text style={styles.headerSubtitle}>📍 GPS Active: Bashundhara R/A (Dhaka)</Text>
       </View>
 
       {/* Listing Feed */}
@@ -115,7 +112,7 @@ export default function App() {
 
               <View style={styles.costBadge}>
                 <Text style={styles.costBadgeText}>
-                  💡 Total: ৳{(item.rent + item.utility).toLocaleString()}/mo (Incl. Utils)
+                  Total: ৳{(item.rent + item.utility).toLocaleString()}/mo (Incl. Utils)
                 </Text>
               </View>
 
@@ -124,14 +121,14 @@ export default function App() {
                   style={styles.callButton}
                   onPress={() => handleStartCall(item)}
                 >
-                  <Text style={styles.callButtonText}>📞 In-App Call</Text>
+                  <Text style={styles.callButtonText}>In-App Call</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.chatButton}
                   onPress={() => setSelectedListing(item)}
                 >
-                  <Text style={styles.chatButtonText}>💬 Chat</Text>
+                  <Text style={styles.chatButtonText}>Chat</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -144,17 +141,17 @@ export default function App() {
         <View style={styles.callModalContainer}>
           <View style={styles.callModalContent}>
             <View style={styles.avatarCircle}>
-              <Text style={{ fontSize: 36 }}>🏠</Text>
+              <Text style={{ fontSize: 32, color: '#c9722d' }}>🏛️</Text>
             </View>
             <Text style={styles.callerName}>{activeCall?.landlord}</Text>
             <Text style={styles.callerListing}>{activeCall?.title}</Text>
             <Text style={styles.callStatus}>
-              🟢 Connected (00:{callTimer < 10 ? `0${callTimer}` : callTimer})
+              Connected (00:{callTimer < 10 ? `0${callTimer}` : callTimer})
             </Text>
             <Text style={styles.privacyShieldText}>🔒 Privacy Shield: Number Hidden</Text>
 
             <TouchableOpacity style={styles.endCallButton} onPress={handleEndCall}>
-              <Text style={styles.endCallButtonText}>End Call 📵</Text>
+              <Text style={styles.endCallButtonText}>End Call</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -163,179 +160,183 @@ export default function App() {
   );
 }
 
-// React Native StyleSheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0f1d',
+    backgroundColor: '#14120f',
   },
   header: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
-    backgroundColor: '#0f172a',
+    borderBottomColor: '#29241f',
+    backgroundColor: '#1a1714',
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     color: '#ffffff',
+    letterSpacing: -0.5,
   },
-  cyanText: {
-    color: '#38bdf8',
+  terracottaText: {
+    color: '#c9722d',
   },
   headerSubtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
+    fontSize: 11,
+    color: '#b3aba2',
     marginTop: 2,
   },
   listContainer: {
-    padding: 16,
-    gap: 16,
+    padding: 14,
   },
   card: {
-    backgroundColor: '#131c31',
-    borderRadius: 16,
+    backgroundColor: '#1a1714',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#29241f',
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   cardImage: {
     width: '100%',
-    height: 150,
+    height: 140,
   },
   cardContent: {
-    padding: 14,
+    padding: 12,
   },
   badgeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   distanceBadge: {
-    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-    color: '#38bdf8',
+    backgroundColor: 'rgba(201, 114, 45, 0.15)',
+    color: '#c9722d',
     fontSize: 11,
     fontWeight: '700',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   rentText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
-    color: '#10b981',
+    color: '#ffffff',
   },
   cardTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#ffffff',
-    marginVertical: 4,
+    marginVertical: 3,
   },
   areaText: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginBottom: 8,
+    fontSize: 11,
+    color: '#7d756c',
+    marginBottom: 6,
   },
   costBadge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    backgroundColor: 'rgba(201, 114, 45, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderColor: 'rgba(201, 114, 45, 0.3)',
     borderRadius: 6,
-    padding: 6,
-    marginBottom: 10,
+    padding: 5,
+    marginBottom: 8,
   },
   costBadgeText: {
-    fontSize: 11,
-    color: '#fbbf24',
+    fontSize: 10,
+    color: '#c9722d',
     fontWeight: '600',
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
   callButton: {
     flex: 1,
-    backgroundColor: '#059669',
-    paddingVertical: 10,
-    borderRadius: 8,
+    backgroundColor: '#221e1a',
+    borderWidth: 1,
+    borderColor: '#3b342d',
+    paddingVertical: 8,
+    borderRadius: 6,
     alignItems: 'center',
   },
   callButtonText: {
-    color: '#ffffff',
+    color: '#c9722d',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
   },
   chatButton: {
     flex: 1,
-    backgroundColor: '#0284c7',
-    paddingVertical: 10,
-    borderRadius: 8,
+    backgroundColor: '#c9722d',
+    paddingVertical: 8,
+    borderRadius: 6,
     alignItems: 'center',
   },
   chatButtonText: {
     color: '#ffffff',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
   },
   callModalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
+    backgroundColor: 'rgba(10,8,6,0.88)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   callModalContent: {
     width: '100%',
-    maxWidth: 320,
-    backgroundColor: '#0f172a',
-    borderRadius: 24,
-    padding: 24,
+    maxWidth: 300,
+    backgroundColor: '#1a1714',
+    borderRadius: 16,
+    padding: 22,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#38bdf8',
+    borderColor: '#3b342d',
   },
   avatarCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#1e293b',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#221e1a',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#c9722d',
   },
   callerName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: '#ffffff',
   },
   callerListing: {
-    fontSize: 12,
-    color: '#38bdf8',
+    fontSize: 11,
+    color: '#c9722d',
     textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 12,
+    marginTop: 2,
+    marginBottom: 10,
   },
   callStatus: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: '#10b981',
-    marginBottom: 4,
+    color: '#9fe3c2',
+    marginBottom: 2,
   },
   privacyShieldText: {
-    fontSize: 10,
-    color: '#94a3b8',
-    marginBottom: 24,
+    fontSize: 9,
+    color: '#7d756c',
+    marginBottom: 20,
   },
   endCallButton: {
-    backgroundColor: '#f43f5e',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
+    backgroundColor: '#944138',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
   endCallButtonText: {
     color: '#ffffff',
-    fontWeight: '800',
+    fontWeight: '700',
+    fontSize: 12,
   },
 });
