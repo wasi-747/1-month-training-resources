@@ -29,11 +29,95 @@ import {
   RefreshCw
 } from 'lucide-react';
 
+// Haversine distance calculator
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
+const DHAKA_PRESETS = [
+  { id: 'bashundhara', name: 'Bashundhara R/A (NSU)', lat: 23.8165, lng: 90.4285 },
+  { id: 'badda', name: 'Middle Badda (Link Road)', lat: 23.7812, lng: 90.4260 },
+  { id: 'aftabnagar', name: 'Aftabnagar (East West)', lat: 23.7680, lng: 90.4350 },
+  { id: 'gulshan', name: 'Gulshan 1 Circle', lat: 23.7808, lng: 90.4152 },
+  { id: 'dhanmondi', name: 'Dhanmondi 27', lat: 23.7538, lng: 90.3742 },
+  { id: 'mirpur', name: 'Mirpur 10 Metro', lat: 23.8071, lng: 90.3685 },
+  { id: 'saidnagar', name: 'Saidnagar 100 Feet', lat: 23.7995, lng: 90.4420 },
+];
+
 export default function MobileAppSimulator({ listings, onRefresh }) {
   // Mobile Simulator State
   const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'explore' | 'messages' | 'saved'
   const [selectedListing, setSelectedListing] = useState(null);
   const [savedListingIds, setSavedListingIds] = useState(['listing-1']);
+
+  // Real GPS & Simulated Location State
+  const [userLocation, setUserLocation] = useState({
+    name: 'Bashundhara R/A (NSU)',
+    lat: 23.8165,
+    lng: 90.4285,
+    isLiveGPS: false,
+    isDetecting: false,
+  });
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  // Auto-Detect Real Browser / Device GPS
+  const detectLiveGPS = () => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      setUserLocation((prev) => ({ ...prev, isDetecting: true }));
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserLocation({
+            name: `Live GPS (${lat.toFixed(3)}, ${lng.toFixed(3)})`,
+            lat,
+            lng,
+            isLiveGPS: true,
+            isDetecting: false,
+          });
+        },
+        (error) => {
+          console.warn('Geolocation error:', error.message);
+          setUserLocation((prev) => ({ ...prev, isDetecting: false }));
+          alert('GPS permission not allowed. You can choose a Dhaka location preset from the list!');
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
+    }
+  };
+
+  // Attempt auto-detection on initial mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            name: `Your Real Location (${position.coords.latitude.toFixed(3)}, ${position.coords.longitude.toFixed(3)})`,
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            isLiveGPS: true,
+            isDetecting: false,
+          });
+        },
+        () => {
+          // Fallback gracefully to default without prompt error
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,8 +158,27 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
     return () => clearInterval(timer);
   }, [activeCall?.status]);
 
+  // Dynamically compute distances based on active userLocation (Real GPS or Selected Dhaka Hub)
+  const listingsWithDistance = listings.map((item) => {
+    let distanceKm = 0.5;
+    if (item.location && item.location.coordinates) {
+      const [lng, lat] = item.location.coordinates;
+      distanceKm = calculateDistanceKm(userLocation.lat, userLocation.lng, lat, lng);
+    }
+    const distanceStr =
+      distanceKm < 1
+        ? `${Math.round(distanceKm * 1000)}m away`
+        : `${distanceKm.toFixed(1)} km away`;
+
+    return {
+      ...item,
+      distanceKm,
+      distanceStr,
+    };
+  });
+
   // Filtering Logic
-  const filteredListings = listings.filter((item) => {
+  const filteredListings = listingsWithDistance.filter((item) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const match =
@@ -103,7 +206,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
     return true;
   });
 
-  const nearbyListings = [...listings].sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+  const nearbyListings = [...listingsWithDistance].sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
 
   const toggleSave = (id, e) => {
     if (e) e.stopPropagation();
@@ -245,25 +348,88 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
           {/* ========================================================================= */}
           {activeTab === 'radar' && (
             <div style={{ padding: '14px' }}>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div>
+              {/* Header & Interactive GPS Switcher */}
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Compass size={16} style={{ color: 'var(--brand-primary)' }} />
                     <h2 className="font-heading" style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
                       Proximity Radar
                     </h2>
                   </div>
-                  <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    📍 Bashundhara R/A (1.5 km scan)
-                  </p>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      onClick={detectLiveGPS}
+                      title="Auto-Detect My Current Device GPS"
+                      style={{
+                        background: userLocation.isLiveGPS ? 'rgba(61, 120, 93, 0.2)' : 'var(--bg-surface-2)',
+                        border: `1px solid ${userLocation.isLiveGPS ? 'rgba(61, 120, 93, 0.5)' : 'var(--border-subtle)'}`,
+                        color: userLocation.isLiveGPS ? '#9fe3c2' : 'var(--brand-primary)',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.68rem',
+                        fontFamily: 'Space Grotesk',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <MapPin size={11} /> {userLocation.isDetecting ? 'Detecting...' : userLocation.isLiveGPS ? 'Live GPS Active' : 'Detect My GPS'}
+                    </button>
+                    <button
+                      onClick={onRefresh}
+                      style={{ background: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', color: 'var(--brand-primary)', padding: '5px', borderRadius: '50%', cursor: 'pointer' }}
+                    >
+                      <RefreshCw size={12} />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={onRefresh}
-                  style={{ background: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', color: 'var(--brand-primary)', padding: '5px', borderRadius: '50%', cursor: 'pointer' }}
-                >
-                  <RefreshCw size={12} />
-                </button>
+
+                {/* Location Quick Switcher Bar */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="sync-beacon" style={{ width: '6px', height: '6px', background: userLocation.isLiveGPS ? '#4ade80' : 'var(--brand-primary)' }} />
+                    <span style={{ fontSize: '0.72rem', color: '#fff', fontWeight: 600 }}>
+                      {userLocation.name}
+                    </span>
+                  </div>
+
+                  <select
+                    value={DHAKA_PRESETS.find((p) => p.name === userLocation.name)?.id || 'custom'}
+                    onChange={(e) => {
+                      const preset = DHAKA_PRESETS.find((p) => p.id === e.target.value);
+                      if (preset) {
+                        setUserLocation({
+                          name: preset.name,
+                          lat: preset.lat,
+                          lng: preset.lng,
+                          isLiveGPS: false,
+                          isDetecting: false,
+                        });
+                      }
+                    }}
+                    style={{
+                      background: 'var(--bg-surface-2)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--brand-primary)',
+                      fontSize: '0.68rem',
+                      fontFamily: 'Space Grotesk',
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      outline: 'none',
+                    }}
+                  >
+                    {DHAKA_PRESETS.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Architectural Dhaka Map Radar Texture */}
@@ -359,7 +525,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                               borderRadius: '4px',
                             }}
                           >
-                            📍 {item.distanceKm ? `${item.distanceKm} km` : '350m'}
+                            📍 {item.distanceStr || (item.distanceKm ? `${item.distanceKm} km` : '350m')}
                           </span>
                           <span className="font-mono" style={{ color: '#fff', fontWeight: 800, fontSize: '0.9rem' }}>
                             <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
