@@ -510,101 +510,157 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
 
               {/* Feed Card List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {filteredListings.map((item) => (
+                {filteredListings.length === 0 ? (
                   <div
-                    key={item._id}
-                    onClick={() => setSelectedListing(item)}
-                    className="card-surface"
                     style={{
+                      padding: '24px 16px',
+                      textAlign: 'center',
+                      background: 'var(--bg-surface-2)',
+                      border: '1px dashed var(--border-medium)',
                       borderRadius: '12px',
-                      overflow: 'hidden',
-                      cursor: 'pointer',
+                      margin: '10px 0',
                     }}
                   >
-                    <div style={{ position: 'relative', height: '130px' }}>
-                      <img src={item.images[0]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,18,15,0.85) 0%, transparent 60%)' }} />
+                    <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>📍</div>
+                    <h4 className="font-heading" style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>
+                      No listings currently in "{searchQuery}"
+                    </h4>
+                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                      Explore nearby student hubs or reset filters:
+                    </p>
 
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          left: '8px',
-                          background: 'rgba(20, 18, 15, 0.85)',
-                          padding: '2px 7px',
-                          borderRadius: '4px',
-                          fontSize: '0.68rem',
-                          fontFamily: 'Space Grotesk',
-                          fontWeight: 700,
-                          color: '#fff',
-                          border: '1px solid var(--border-subtle)',
-                        }}
-                      >
-                        📍 {item.area}
-                      </div>
-
-                      <button
-                        onClick={(e) => toggleSave(item._id, e)}
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          right: '8px',
-                          background: 'rgba(20, 18, 15, 0.85)',
-                          border: '1px solid var(--border-subtle)',
-                          color: savedListingIds.includes(item._id) ? 'var(--brand-primary)' : '#fff',
-                          width: '26px',
-                          height: '26px',
-                          borderRadius: '50%',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <Bookmark size={12} fill={savedListingIds.includes(item._id) ? 'var(--brand-primary)' : 'none'} />
-                      </button>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center', marginBottom: '14px' }}>
+                      {['Bashundhara', 'Badda', 'Aftabnagar', 'Gulshan', 'Saidnagar', 'Dhanmondi', 'Mirpur'].map((area) => (
+                        <button
+                          key={area}
+                          onClick={() => setSearchQuery(area)}
+                          style={{
+                            background: 'var(--bg-surface-3)',
+                            border: '1px solid var(--border-subtle)',
+                            color: 'var(--brand-primary)',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontFamily: 'Space Grotesk',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          📍 {area}
+                        </button>
+                      ))}
                     </div>
 
-                    <div style={{ padding: '10px 12px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span className="font-mono" style={{ fontSize: '1rem', fontWeight: 800, color: '#fff' }}>
-                          <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
-                          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 400 }}> /mo</span>
-                        </span>
-                        <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--brand-primary)', fontWeight: 700 }}>
-                          +<span className="taka-symbol">৳</span>{(item.utilityInfo?.totalUtility || 0).toLocaleString()} Utils
-                        </span>
-                      </div>
-
-                      <h3 style={{ fontSize: '0.84rem', fontWeight: 700, color: '#fff', margin: '3px 0' }}>
-                        {item.title}
-                      </h3>
-
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                        {item.addressText}
-                      </p>
-
-                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                        {item.amenities.slice(0, 3).map((a) => (
-                          <span
-                            key={a}
-                            style={{
-                              background: 'var(--bg-surface-2)',
-                              border: '1px solid var(--border-subtle)',
-                              color: 'var(--text-secondary)',
-                              fontSize: '0.64rem',
-                              padding: '2px 5px',
-                              borderRadius: '4px',
-                              textTransform: 'capitalize',
-                            }}
-                          >
-                            {a.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedTenantType('all');
+                        setSelectedRoomType('all');
+                        setMaxRent(35000);
+                      }}
+                      className="btn-surface"
+                      style={{ fontSize: '0.74rem', padding: '5px 12px' }}
+                    >
+                      Reset All Filters ↺
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  filteredListings.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => setSelectedListing(item)}
+                      className="card-surface"
+                      style={{
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ position: 'relative', height: '130px' }}>
+                        <img src={item.images[0]} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(20,18,15,0.85) 0%, transparent 60%)' }} />
+
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '8px',
+                            left: '8px',
+                            background: 'rgba(20, 18, 15, 0.85)',
+                            padding: '2px 7px',
+                            borderRadius: '4px',
+                            fontSize: '0.68rem',
+                            fontFamily: 'Space Grotesk',
+                            fontWeight: 700,
+                            color: '#fff',
+                            border: '1px solid var(--border-subtle)',
+                          }}
+                        >
+                          📍 {item.area}
+                        </div>
+
+                        <button
+                          onClick={(e) => toggleSave(item._id, e)}
+                          style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            background: 'rgba(20, 18, 15, 0.85)',
+                            border: '1px solid var(--border-subtle)',
+                            color: savedListingIds.includes(item._id) ? 'var(--brand-primary)' : '#fff',
+                            width: '26px',
+                            height: '26px',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Bookmark size={12} fill={savedListingIds.includes(item._id) ? 'var(--brand-primary)' : 'none'} />
+                        </button>
+                      </div>
+
+                      <div style={{ padding: '10px 12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span className="font-mono" style={{ fontSize: '1rem', fontWeight: 800, color: '#fff' }}>
+                            <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
+                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 400 }}> /mo</span>
+                          </span>
+                          <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--brand-primary)', fontWeight: 700 }}>
+                            +<span className="taka-symbol">৳</span>{(item.utilityInfo?.totalUtility || 0).toLocaleString()} Utils
+                          </span>
+                        </div>
+
+                        <h3 style={{ fontSize: '0.84rem', fontWeight: 700, color: '#fff', margin: '3px 0' }}>
+                          {item.title}
+                        </h3>
+
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                          {item.addressText}
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                          {item.amenities.slice(0, 3).map((a) => (
+                            <span
+                              key={a}
+                              style={{
+                                background: 'var(--bg-surface-2)',
+                                border: '1px solid var(--border-subtle)',
+                                color: 'var(--text-secondary)',
+                                fontSize: '0.64rem',
+                                padding: '2px 5px',
+                                borderRadius: '4px',
+                                textTransform: 'capitalize',
+                              }}
+                            >
+                              {a.replace('_', ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

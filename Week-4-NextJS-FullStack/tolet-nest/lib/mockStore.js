@@ -277,6 +277,92 @@ let inMemoryListings = [
     createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
     updatedAt: new Date().toISOString(),
   },
+  {
+    _id: 'listing-7',
+    title: 'Bachelor Master Room near BRAC / East West (Middle Badda)',
+    description:
+      'Separate attached bath master room for male students or job holders. 2 minutes from Middle Badda Link Road & Hatirjheel. High-speed optic fiber WiFi and generator.',
+    rentAmount: 7200,
+    area: 'Badda',
+    addressText: 'Pragoti Shoroni, Middle Badda (Near Link Road & Hatirjheel)',
+    location: {
+      type: 'Point',
+      coordinates: [90.4260, 23.7812],
+    },
+    propertyType: 'master_bed',
+    tenantType: 'bachelor_male',
+    utilityInfo: {
+      mode: 'itemized',
+      totalUtility: 1100,
+      breakdown: {
+        electricity: 450,
+        gas: 200,
+        water: 150,
+        serviceCharge: 150,
+        wifi: 150,
+        waste: 0,
+      },
+    },
+    amenities: ['attached_bath', 'balcony', 'wifi', 'gas', 'no_curfew'],
+    availableFrom: new Date('2026-09-01T00:00:00.000Z').toISOString(),
+    images: [
+      'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80',
+    ],
+    status: 'available',
+    landlord: {
+      name: 'Advocate Monirul Islam',
+      phone: '01712-445566',
+      showPublicPhone: false,
+      allowInAppCall: true,
+      allowInAppChat: true,
+    },
+    viewsCount: 145,
+    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    _id: 'listing-8',
+    title: 'Furnished Female Student Sublet in Aftabnagar Block B',
+    description:
+      'Spacious well-ventilated room with attached balcony for female student in Aftabnagar Block B. Very close to East West University & Rampura Bridge.',
+    rentAmount: 6000,
+    area: 'Aftabnagar',
+    addressText: 'Road 3, Block B, Aftabnagar (5 mins walk to East West University)',
+    location: {
+      type: 'Point',
+      coordinates: [90.4350, 23.7680],
+    },
+    propertyType: 'single_room',
+    tenantType: 'bachelor_female',
+    utilityInfo: {
+      mode: 'inclusive',
+      totalUtility: 850,
+      breakdown: {
+        electricity: 0,
+        gas: 0,
+        water: 0,
+        serviceCharge: 0,
+        wifi: 0,
+        waste: 0,
+      },
+    },
+    amenities: ['balcony', 'wifi', 'lift', 'gas', 'meal_system'],
+    availableFrom: new Date('2026-09-01T00:00:00.000Z').toISOString(),
+    images: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80',
+    ],
+    status: 'available',
+    landlord: {
+      name: 'Mrs. Rokeya Begum',
+      phone: '01819-223344',
+      showPublicPhone: true,
+      allowInAppCall: true,
+      allowInAppChat: true,
+    },
+    viewsCount: 110,
+    createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
 ];
 
 // Seeded In-Memory Conversations (for In-App Chat & Call Simulation)
@@ -422,6 +508,8 @@ export const mockStore = {
     const defaultCoords = {
       'Bashundhara R/A': [90.4285, 23.8165],
       Saidnagar: [90.442, 23.7995],
+      Badda: [90.4260, 23.7812],
+      Aftabnagar: [90.4350, 23.7680],
       Gulshan: [90.4152, 23.7808],
       Banani: [90.4043, 23.7937],
       Dhanmondi: [90.3742, 23.7538],

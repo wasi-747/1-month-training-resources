@@ -498,11 +498,14 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
                   >
                     <option value="Bashundhara R/A">Bashundhara R/A</option>
                     <option value="Saidnagar">Saidnagar</option>
+                    <option value="Badda">Badda</option>
+                    <option value="Aftabnagar">Aftabnagar</option>
                     <option value="Gulshan">Gulshan</option>
                     <option value="Banani">Banani</option>
                     <option value="Dhanmondi">Dhanmondi</option>
                     <option value="Mirpur">Mirpur</option>
                     <option value="Uttara">Uttara</option>
+                    <option value="Mohakhali">Mohakhali</option>
                   </select>
                 </div>
               </div>

@@ -25,6 +25,8 @@ const ListingSchema = new mongoose.Schema(
       enum: [
         'Bashundhara R/A',
         'Saidnagar',
+        'Badda',
+        'Aftabnagar',
         'Gulshan',
         'Banani',
         'Dhanmondi',
