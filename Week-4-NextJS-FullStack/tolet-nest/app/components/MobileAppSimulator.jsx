@@ -26,7 +26,12 @@ import {
   Droplet,
   Wifi,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  PlusCircle,
+  Plus,
+  Users,
+  GraduationCap,
+  Home
 } from 'lucide-react';
 
 // Haversine distance calculator
@@ -56,9 +61,25 @@ const DHAKA_PRESETS = [
 
 export default function MobileAppSimulator({ listings, onRefresh }) {
   // Mobile Simulator State
-  const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'explore' | 'messages' | 'saved'
+  const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'explore' | 'post' | 'messages' | 'saved'
   const [selectedListing, setSelectedListing] = useState(null);
   const [savedListingIds, setSavedListingIds] = useState(['listing-1']);
+
+  // Mobile Fast Posting State (P2P Student Sublet / Seat / Landlord)
+  const [mobilePostData, setMobilePostData] = useState({
+    posterRole: 'student_outgoing', // 'student_outgoing' | 'flatmate' | 'sublet_host' | 'landlord'
+    title: '',
+    area: 'Bashundhara R/A',
+    addressText: '',
+    rentAmount: '',
+    utilityAmount: '800',
+    tenantType: 'bachelor_male',
+    propertyType: 'single_room',
+    amenities: ['wifi', 'gas'],
+    posterName: 'Wasiur Rahman (Student)',
+    phone: '01700-123456',
+  });
+  const [isPostingFromMobile, setIsPostingFromMobile] = useState(false);
 
   // Real GPS & Simulated Location State
   const [userLocation, setUserLocation] = useState({
@@ -298,6 +319,90 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
           },
         ],
       }));
+    }
+  };
+
+  // Fast Mobile Post Handler (For Students, Flatmates & Landlords)
+  const handleMobileSubmitPost = async (e) => {
+    e.preventDefault();
+    if (!mobilePostData.title || !mobilePostData.rentAmount) {
+      alert('Please enter a listing title and monthly rent');
+      return;
+    }
+    setIsPostingFromMobile(true);
+    try {
+      const payload = {
+        title: mobilePostData.title,
+        description: `Posted via Mobile by ${
+          mobilePostData.posterRole === 'student_outgoing'
+            ? 'Outgoing Student (Seat Transfer)'
+            : mobilePostData.posterRole === 'flatmate'
+            ? 'Bachelor Flatmate (Roommate Wanted)'
+            : mobilePostData.posterRole === 'sublet_host'
+            ? 'Sublet Host'
+            : 'Landlord'
+        }. In-app private communication only.`,
+        rentAmount: Number(mobilePostData.rentAmount),
+        area: mobilePostData.area,
+        addressText: mobilePostData.addressText || `${mobilePostData.area}, Dhaka`,
+        propertyType: mobilePostData.propertyType,
+        tenantType: mobilePostData.tenantType,
+        utilityInfo: {
+          mode: 'itemized',
+          totalUtility: Number(mobilePostData.utilityAmount) || 0,
+          breakdown: {
+            electricity: Math.round((Number(mobilePostData.utilityAmount) || 0) * 0.4),
+            gas: Math.round((Number(mobilePostData.utilityAmount) || 0) * 0.2),
+            water: Math.round((Number(mobilePostData.utilityAmount) || 0) * 0.15),
+            serviceCharge: Math.round((Number(mobilePostData.utilityAmount) || 0) * 0.15),
+            wifi: Math.round((Number(mobilePostData.utilityAmount) || 0) * 0.1),
+            waste: 0,
+          },
+        },
+        amenities: mobilePostData.amenities,
+        images: [
+          'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80',
+        ],
+        landlord: {
+          name: mobilePostData.posterName || 'Host / Flatmate',
+          phone: mobilePostData.phone || '01700-123456',
+          showPublicPhone: false,
+          allowInAppCall: true,
+          allowInAppChat: true,
+        },
+      };
+
+      const res = await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert('🎉 To-Let / Seat published successfully from your mobile! It is now live on the Dhaka Radar.');
+        if (onRefresh) onRefresh();
+        setActiveTab('radar');
+        setMobilePostData({
+          posterRole: 'student_outgoing',
+          title: '',
+          area: 'Bashundhara R/A',
+          addressText: '',
+          rentAmount: '',
+          utilityAmount: '800',
+          tenantType: 'bachelor_male',
+          propertyType: 'single_room',
+          amenities: ['wifi', 'gas'],
+          posterName: 'Wasiur Rahman (Student)',
+          phone: '01700-123456',
+        });
+      } else {
+        alert('Failed to publish listing.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error publishing listing.');
+    } finally {
+      setIsPostingFromMobile(false);
     }
   };
 
@@ -926,10 +1031,267 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
               </div>
             </div>
           )}
+
+          {/* ========================================================================= */}
+          {/* TAB 3: ➕ FAST MOBILE POSTING (STUDENTS, FLATMATES & LANDLORDS)            */}
+          {/* ========================================================================= */}
+          {activeTab === 'post' && (
+            <div style={{ padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                <PlusCircle size={16} style={{ color: 'var(--brand-primary)' }} />
+                <div>
+                  <h2 className="font-heading" style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+                    Post Seat / To-Let
+                  </h2>
+                  <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                    For outgoing students, flatmates & property owners
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleMobileSubmitPost} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* Poster Role Selector */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Posting As *
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
+                    {[
+                      { id: 'student_outgoing', label: '🎓 Student (Seat)', desc: 'Replacing seat' },
+                      { id: 'flatmate', label: '🤝 Flatmate', desc: 'Need roommate' },
+                      { id: 'sublet_host', label: '🏡 Sublet Host', desc: 'Sublet room' },
+                      { id: 'landlord', label: '🏛️ Landlord', desc: 'Property owner' },
+                    ].map((role) => (
+                      <button
+                        type="button"
+                        key={role.id}
+                        onClick={() => setMobilePostData({ ...mobilePostData, posterRole: role.id })}
+                        style={{
+                          background: mobilePostData.posterRole === role.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                          color: mobilePostData.posterRole === role.id ? '#fff' : 'var(--text-secondary)',
+                          border: `1px solid ${mobilePostData.posterRole === role.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                          padding: '6px 8px',
+                          borderRadius: '6px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, fontFamily: 'Space Grotesk' }}>{role.label}</div>
+                        <div style={{ fontSize: '0.62rem', opacity: 0.8 }}>{role.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                    Listing Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 1 Seat Vacant in Bachelor Flat (Near NSU)"
+                    value={mobilePostData.title}
+                    onChange={(e) => setMobilePostData({ ...mobilePostData, title: e.target.value })}
+                    style={{
+                      width: '100%',
+                      background: 'var(--bg-surface-2)',
+                      border: '1px solid var(--border-subtle)',
+                      color: '#fff',
+                      padding: '7px 9px',
+                      borderRadius: '6px',
+                      fontSize: '0.78rem',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                {/* Area & Address */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Dhaka Area *
+                    </label>
+                    <select
+                      value={mobilePostData.area}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, area: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px',
+                        borderRadius: '6px',
+                        fontSize: '0.74rem',
+                        outline: 'none',
+                      }}
+                    >
+                      {['Bashundhara R/A', 'Badda', 'Aftabnagar', 'Gulshan', 'Saidnagar', 'Dhanmondi', 'Mirpur', 'Uttara'].map((a) => (
+                        <option key={a} value={a}>{a}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Landmark / Road
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Block C, Road 4"
+                      value={mobilePostData.addressText}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, addressText: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px 9px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Base Rent & Utility */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Base Rent (৳) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="e.g. 5500"
+                      value={mobilePostData.rentAmount}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, rentAmount: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px 9px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        outline: 'none',
+                        fontFamily: 'JetBrains Mono',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Est. Utility Bill (৳)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 800"
+                      value={mobilePostData.utilityAmount}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, utilityAmount: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px 9px',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        outline: 'none',
+                        fontFamily: 'JetBrains Mono',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Transparent Total Preview */}
+                {mobilePostData.rentAmount && (
+                  <div
+                    style={{
+                      background: 'rgba(201, 114, 45, 0.1)',
+                      border: '1px solid rgba(201, 114, 45, 0.3)',
+                      borderRadius: '6px',
+                      padding: '6px 10px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>Total Est. Monthly:</span>
+                    <span className="font-mono" style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                      <span className="taka-symbol">৳</span>
+                      {(Number(mobilePostData.rentAmount || 0) + Number(mobilePostData.utilityAmount || 0)).toLocaleString()} /mo
+                    </span>
+                  </div>
+                )}
+
+                {/* Preference */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Room Type
+                    </label>
+                    <select
+                      value={mobilePostData.propertyType}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, propertyType: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px',
+                        borderRadius: '6px',
+                        fontSize: '0.74rem',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="single_room">Single Room</option>
+                      <option value="master_bed">Master Bed</option>
+                      <option value="shared_room">Shared Seat</option>
+                      <option value="sublet">Sublet</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      For Whom
+                    </label>
+                    <select
+                      value={mobilePostData.tenantType}
+                      onChange={(e) => setMobilePostData({ ...mobilePostData, tenantType: e.target.value })}
+                      style={{
+                        width: '100%',
+                        background: 'var(--bg-surface-2)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        padding: '7px',
+                        borderRadius: '6px',
+                        fontSize: '0.74rem',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="bachelor_male">Bachelor Male</option>
+                      <option value="bachelor_female">Female Student</option>
+                      <option value="job_holder">Job Holder</option>
+                      <option value="any">Anyone</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isPostingFromMobile}
+                  className="btn-terracotta"
+                  style={{ width: '100%', padding: '9px', fontSize: '0.82rem', marginTop: '4px' }}
+                >
+                  {isPostingFromMobile ? 'Publishing...' : '🚀 Publish Instantly to Dhaka Radar'}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
 
         {/* ========================================================================= */}
-        {/* BOTTOM TAB NAVIGATOR                                                      */}
+        {/* BOTTOM TAB NAVIGATOR (5-Tab Seamless Switcher)                            */}
         {/* ========================================================================= */}
         <div
           style={{
@@ -945,6 +1307,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
           {[
             { id: 'radar', label: 'Radar', icon: Compass },
             { id: 'explore', label: 'Explore', icon: Search },
+            { id: 'post', label: '+ Post', icon: PlusCircle, isHighlight: true },
             { id: 'messages', label: 'Chats', icon: MessageSquare },
             { id: 'saved', label: 'Saved', icon: Bookmark },
           ].map((tab) => {
@@ -959,20 +1322,28 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                   setActiveChatListing(null);
                 }}
                 style={{
-                  background: 'none',
+                  background: tab.isHighlight && isActive ? 'var(--brand-primary)' : 'none',
                   border: 'none',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '2px',
-                  color: isActive ? 'var(--brand-primary)' : 'var(--text-muted)',
+                  color: tab.isHighlight
+                    ? isActive
+                      ? '#fff'
+                      : 'var(--brand-primary)'
+                    : isActive
+                    ? 'var(--brand-primary)'
+                    : 'var(--text-muted)',
                   fontSize: '0.66rem',
                   fontFamily: 'Space Grotesk',
-                  fontWeight: isActive ? 700 : 500,
+                  fontWeight: isActive || tab.isHighlight ? 700 : 500,
                   cursor: 'pointer',
+                  padding: tab.isHighlight ? '4px 8px' : '2px',
+                  borderRadius: tab.isHighlight ? '8px' : '0',
                 }}
               >
-                <Icon size={16} strokeWidth={isActive ? 2.5 : 1.8} />
+                <Icon size={tab.isHighlight ? 18 : 16} strokeWidth={isActive ? 2.5 : 1.8} />
                 {tab.label}
               </button>
             );

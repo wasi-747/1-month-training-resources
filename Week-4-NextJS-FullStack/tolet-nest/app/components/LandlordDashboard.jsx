@@ -472,6 +472,39 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Posting Role */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Posting As *
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                  {[
+                    { id: 'student_outgoing', label: '🎓 Outgoing Student', desc: 'Seat Replacement' },
+                    { id: 'flatmate', label: '🤝 Flatmate', desc: 'Need Roommate' },
+                    { id: 'sublet_host', label: '🏡 Sublet Host', desc: 'Sublet Room' },
+                    { id: 'landlord', label: '🏛️ Landlord', desc: 'Property Owner' },
+                  ].map((role) => (
+                    <button
+                      type="button"
+                      key={role.id}
+                      onClick={() => setFormData({ ...formData, posterRole: role.id })}
+                      style={{
+                        background: (formData.posterRole || 'landlord') === role.id ? 'var(--brand-primary)' : 'var(--bg-main)',
+                        color: (formData.posterRole || 'landlord') === role.id ? '#fff' : 'var(--text-secondary)',
+                        border: `1px solid ${(formData.posterRole || 'landlord') === role.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <p style={{ fontSize: '0.78rem', fontWeight: 700, fontFamily: 'Space Grotesk' }}>{role.label}</p>
+                      <p style={{ fontSize: '0.68rem', opacity: 0.8 }}>{role.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Title & Area */}
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
                 <div>
