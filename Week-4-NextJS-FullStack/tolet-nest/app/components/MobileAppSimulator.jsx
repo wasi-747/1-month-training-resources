@@ -31,8 +31,91 @@ import {
   Plus,
   Users,
   GraduationCap,
-  Home
+  Home,
+  Building
 } from 'lucide-react';
+
+// Web Audio API Ringtone & Call Audio Synthesizer
+let audioStopFn = null;
+
+function playAudioTone(type = 'ringing') {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    if (type === 'ringing') {
+      let isRinging = true;
+      const ringCycle = () => {
+        if (!isRinging || ctx.state === 'closed') return;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.frequency.value = 440; // Standard US/UK ringback
+        osc2.frequency.value = 480;
+        gain.gain.value = 0.05;
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start();
+        osc2.start();
+
+        setTimeout(() => {
+          try {
+            osc1.stop();
+            osc2.stop();
+          } catch (e) {}
+        }, 1200);
+      };
+
+      ringCycle();
+      const ringInterval = setInterval(ringCycle, 3000);
+
+      audioStopFn = () => {
+        isRinging = false;
+        clearInterval(ringInterval);
+        try {
+          ctx.close();
+        } catch (e) {}
+      };
+    } else if (type === 'connected') {
+      if (audioStopFn) {
+        audioStopFn();
+        audioStopFn = null;
+      }
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'ended') {
+      if (audioStopFn) {
+        audioStopFn();
+        audioStopFn = null;
+      }
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.setValueAtTime(350, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    }
+  } catch (err) {
+    console.warn('AudioContext error:', err);
+  }
+}
 
 // Haversine distance calculator
 function calculateDistanceKm(lat1, lon1, lat2, lon2) {
@@ -248,6 +331,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
   };
 
   const handleStartCall = (listing) => {
+    playAudioTone('ringing');
     setActiveCall({
       listing,
       status: 'ringing',
@@ -256,11 +340,13 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
     });
 
     setTimeout(() => {
+      playAudioTone('connected');
       setActiveCall((prev) => (prev ? { ...prev, status: 'connected' } : null));
-    }, 2000);
+    }, 2500);
   };
 
   const handleEndCall = () => {
+    playAudioTone('ended');
     if (activeCall) {
       const duration = activeCall.duration;
       const listingId = activeCall.listing._id;
