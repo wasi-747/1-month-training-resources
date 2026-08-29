@@ -846,7 +846,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                   </span>
                 </div>
 
-                {/* Dynamic Relative Listing Pins on Real Map */}
+                {/* Dynamic Relative Listing Points on Real Map (Clean Dot Blips) */}
                 {listingsWithDistance.map((item) => {
                   const pos = calculatePinPosition(item.location?.coordinates);
                   if (!pos.isVisible) return null;
@@ -856,14 +856,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                   const isDining = item.rentalCategory === 'dining_space' || item.propertyType === 'dining_space';
                   const isFlat = item.rentalCategory === 'full_flat' || item.propertyType === 'full_flat';
 
-                  const badgeColor = isSeat ? '#9fe3c2' : isDining ? '#f6cd8b' : isFlat ? '#93c5fd' : '#f6f3ee';
-                  const badgeBg = isSelected
-                    ? 'var(--brand-primary)'
-                    : isSeat
-                    ? '#1f3a2c'
-                    : isDining
-                    ? '#382a18'
-                    : '#221e1a';
+                  const pointColor = isSeat ? '#4ade80' : isDining ? '#f6cd8b' : isFlat ? '#93c5fd' : '#c9722d';
 
                   return (
                     <div
@@ -874,46 +867,32 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                         left: `${pos.x}%`,
                         top: `${pos.y}%`,
                         transform: 'translate(-50%, -50%)',
-                        zIndex: isSelected ? 25 : 12,
+                        zIndex: isSelected ? 30 : 12,
                         cursor: 'pointer',
+                        padding: '6px', // Larger touch target
                         transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
-                      title={`${item.title} (৳${item.rentAmount.toLocaleString()})`}
+                      title={`${item.title} (Click for details)`}
                     >
                       <div
                         style={{
-                          background: badgeBg,
-                          border: `1px solid ${isSelected ? '#fff' : 'rgba(201, 114, 45, 0.4)'}`,
-                          borderRadius: '12px',
-                          padding: '2px 5px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px',
+                          width: isSelected ? '14px' : '9px',
+                          height: isSelected ? '14px' : '9px',
+                          borderRadius: '50%',
+                          background: isSelected ? '#fff' : pointColor,
+                          border: `2px solid ${isSelected ? 'var(--brand-primary)' : 'rgba(20, 18, 15, 0.9)'}`,
                           boxShadow: isSelected
-                            ? '0 0 14px var(--brand-primary)'
-                            : '0 2px 8px rgba(0,0,0,0.6)',
-                          transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                            ? '0 0 16px var(--brand-primary), 0 0 0 4px rgba(201, 114, 45, 0.4)'
+                            : `0 0 8px ${pointColor}`,
+                          transform: isSelected ? 'scale(1.2)' : 'scale(1)',
+                          transition: 'all 0.2s ease',
                         }}
-                      >
-                        <span style={{ fontSize: '0.62rem' }}>
-                          {isSeat ? '🛏️' : isDining ? '🍽️' : isFlat ? '🏢' : '🚪'}
-                        </span>
-                        <span
-                          className="font-mono"
-                          style={{
-                            fontSize: '0.62rem',
-                            fontWeight: 800,
-                            color: isSelected ? '#fff' : badgeColor,
-                          }}
-                        >
-                          ৳{(item.rentAmount / 1000).toFixed(1)}k
-                        </span>
-                      </div>
+                      />
                     </div>
                   );
                 })}
 
-                {/* Floating Map Pin Preview Card (When Pin Clicked) */}
+                {/* Floating Map Point Preview Card (When Point Clicked) */}
                 {selectedMapListing && (
                   <div
                     style={{
@@ -928,7 +907,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                       display: 'flex',
                       gap: '8px',
                       alignItems: 'center',
-                      zIndex: 30,
+                      zIndex: 40,
                       boxShadow: '0 8px 24px rgba(0,0,0,0.85)',
                       animation: 'messageSlideIn 0.2s ease forwards',
                     }}
@@ -952,7 +931,7 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                       </h5>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                       <button
                         onClick={() => handleStartCall(selectedMapListing)}
                         style={{
@@ -973,15 +952,25 @@ export default function MobileAppSimulator({ listings, onRefresh }) {
                           setSelectedMapListing(null);
                         }}
                         className="btn-terracotta"
-                        style={{ fontSize: '0.66rem', padding: '4px 8px', borderRadius: '6px' }}
+                        style={{ fontSize: '0.68rem', padding: '5px 9px', borderRadius: '6px', fontWeight: 700, cursor: 'pointer' }}
                       >
                         View
                       </button>
                       <button
                         onClick={() => setSelectedMapListing(null)}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer', padding: '2px' }}
+                        style={{
+                          background: 'var(--bg-surface-2)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-secondary)',
+                          fontSize: '0.68rem',
+                          padding: '5px 8px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontFamily: 'Space Grotesk',
+                          fontWeight: 600,
+                        }}
                       >
-                        ✕
+                        Cancel
                       </button>
                     </div>
                   </div>
