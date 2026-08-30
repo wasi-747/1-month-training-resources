@@ -1,370 +1,272 @@
 /**
  * ==============================================================================================
- * 📱 ToLetNest — React Native Mobile Client Application
+ * 📱 ToLetNest — Native Full-Stack Mobile Client (Expo SDK 57)
  * ==============================================================================================
- * Pure React Native Core Architecture (Warm Dhaka Terracotta & Charcoal Palette):
- * - Uses Native Components: View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Modal
- * - Privacy-First In-App Audio Calling & One-Tap Close Chat Anti-Harassment Shield
+ * Native GPS Hardware Integration + Web GIS Engine:
+ * - Direct Hardware GPS via expo-location (High Accuracy)
+ * - Automatic Location Permission Request on Android & iOS
+ * - 2-Way Native-to-WebView GPS Bridge
+ * - Full Leaflet Dhaka Street Maps & Satellite Tiles
+ * - Interactive Foodpanda Center Pin-Drop & Reverse Geocoding
  * ==============================================================================================
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
+  StyleSheet,
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  TextInput,
-  Modal,
-  Image,
-  ScrollView,
   StatusBar,
   SafeAreaView,
-  Alert
+  Platform,
+  ActivityIndicator,
+  TouchableOpacity
 } from 'react-native';
+import { WebView } from 'react-native-webview';
+import * as Location from 'expo-location';
+
+// Production 24/7 Global HTTPS Cloud Endpoint (Vercel + MongoDB Atlas)
+const DEV_SERVER_URL = 'https://tolet-nest.vercel.app';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('radar');
-  const [selectedListing, setSelectedListing] = useState(null);
-  const [activeCall, setActiveCall] = useState(null);
-  const [isCalling, setIsCalling] = useState(false);
-  const [callTimer, setCallTimer] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [userCoords, setUserCoords] = useState(null);
+  const webViewRef = useRef(null);
 
-  const [listings, setListings] = useState([
-    {
-      id: '1',
-      title: '1 Seat in 2-Person Bachelor Room (Near NSU)',
-      rent: 3800,
-      utility: 750,
-      area: 'Bashundhara R/A',
-      distance: '250m away',
-      rentalCategory: 'Seat Rent',
-      tenantType: 'Bachelor Male',
-      amenities: ['WiFi', 'Attached Bath', 'Meal System'],
-      landlord: 'Tanvir (Outgoing Student)',
-      image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: '2',
-      title: 'Partitioned Dining Space Bed (Saidnagar)',
-      rent: 2800,
-      utility: 600,
-      area: 'Saidnagar 100ft',
-      distance: '650m away',
-      rentalCategory: 'Dining Space',
-      tenantType: 'Bachelor Male',
-      amenities: ['WiFi', 'Gas', 'Meal System'],
-      landlord: 'Shakil (Flatmate)',
-      image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: '3',
-      title: 'Bachelor Master Bed with Attached Bath',
-      rent: 8500,
-      utility: 1450,
-      area: 'Bashundhara R/A',
-      distance: '350m away',
-      rentalCategory: 'Room Rent',
-      tenantType: 'Bachelor Male',
-      amenities: ['WiFi', 'Attached Bath', 'Balcony', 'No Curfew'],
-      landlord: 'Engr. Rafiqul Islam',
-      image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-      id: '4',
-      title: 'Female Student Sublet Room (Near IUB)',
-      rent: 6500,
-      utility: 1000,
-      area: 'Bashundhara R/A',
-      distance: '650m away',
-      rentalCategory: 'Sublet',
-      tenantType: 'Female Student',
-      amenities: ['WiFi', 'Lift', 'Meal System'],
-      landlord: 'Mrs. Selina Akhter',
-      image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&q=80',
+  // Request Native Device GPS Permission on startup with ultra-fast cached + balanced fix
+  const requestNativeGPS = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        // 1. Instant Cached Location (0.01 sec response)
+        const cached = await Location.getLastKnownPositionAsync();
+        if (cached && cached.coords) {
+          const { latitude, longitude } = cached.coords;
+          setUserCoords({ lat: latitude, lng: longitude });
+          if (webViewRef.current) {
+            webViewRef.current.injectJavaScript(`
+              if (typeof window.handleNativeGPSUpdate === 'function') {
+                window.handleNativeGPSUpdate(${latitude}, ${longitude});
+              }
+              true;
+            `);
+          }
+        }
+
+        // 2. Fresh Balanced Fix (3.5s timeout race so it never hangs)
+        try {
+          const fresh = await Promise.race([
+            Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('GPS Timeout')), 3500)),
+          ]);
+
+          if (fresh && fresh.coords) {
+            const { latitude, longitude } = fresh.coords;
+            setUserCoords({ lat: latitude, lng: longitude });
+            if (webViewRef.current) {
+              webViewRef.current.injectJavaScript(`
+                if (typeof window.handleNativeGPSUpdate === 'function') {
+                  window.handleNativeGPSUpdate(${latitude}, ${longitude});
+                }
+                true;
+              `);
+            }
+            return { lat: latitude, lng: longitude };
+          }
+        } catch (timeoutErr) {
+          // Timeout reached, used cached position
+        }
+
+        if (cached && cached.coords) {
+          return { lat: cached.coords.latitude, lng: cached.coords.longitude };
+        }
+      }
+    } catch (e) {
+      console.warn('Native GPS request error:', e);
     }
-  ]);
 
-  useEffect(() => {
-    let interval;
-    if (isCalling) {
-      interval = setInterval(() => setCallTimer((prev) => prev + 1), 1000);
-    } else {
-      setCallTimer(0);
+    // Safety: Clear detecting state in WebView if GPS unavailable
+    if (webViewRef.current) {
+      webViewRef.current.injectJavaScript(`
+        if (typeof window.handleNativeGPSFail === 'function') {
+          window.handleNativeGPSFail();
+        }
+        true;
+      `);
     }
-    return () => clearInterval(interval);
-  }, [isCalling]);
-
-  const handleStartCall = (listing) => {
-    setActiveCall(listing);
-    setIsCalling(true);
+    return null;
   };
 
-  const handleEndCall = () => {
-    setIsCalling(false);
-    setActiveCall(null);
-    Alert.alert('Call Summary', 'In-App Voice Call Ended. Zero Phone Number Exposure.');
+  useEffect(() => {
+    requestNativeGPS();
+  }, []);
+
+  // Handle messages from the Web app inside the WebView
+  const handleWebMessage = async (event) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'GET_LIVE_GPS') {
+        await requestNativeGPS();
+      }
+    } catch (err) {
+      console.warn('Webview message error:', err);
+    }
+  };
+
+  const handleRetry = () => {
+    setHasError(false);
+    setIsLoading(true);
+    if (webViewRef.current) {
+      webViewRef.current.reload();
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#14120f" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>ToLet<Text style={styles.terracottaText}>Nest</Text></Text>
-        <Text style={styles.headerSubtitle}>📍 GPS Active: Bashundhara R/A (Dhaka)</Text>
-      </View>
-
-      {/* Listing Feed */}
-      <FlatList
-        data={listings}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => setSelectedListing(item)}
-            activeOpacity={0.85}
-          >
-            <Image source={{ uri: item.image }} style={styles.cardImage} />
-            <View style={styles.cardContent}>
-              <View style={styles.badgeRow}>
-                <Text style={styles.distanceBadge}>📍 {item.distance}</Text>
-                <Text style={styles.rentText}>৳{item.rent.toLocaleString()}/mo</Text>
+      <View style={styles.container}>
+        <WebView
+          ref={webViewRef}
+          source={{ uri: DEV_SERVER_URL }}
+          style={styles.webView}
+          originWhitelist={['*']}
+          mixedContentMode="always"
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          geolocationEnabled={true}
+          allowsInlineMediaPlayback={true}
+          mediaPlaybackRequiresUserAction={false}
+          startInLoadingState={true}
+          onMessage={handleWebMessage}
+          onLoadEnd={() => {
+            setIsLoading(false);
+            // Send initial GPS after page load
+            if (userCoords) {
+              webViewRef.current?.injectJavaScript(`
+                if (typeof window.handleNativeGPSUpdate === 'function') {
+                  window.handleNativeGPSUpdate(${userCoords.lat}, ${userCoords.lng});
+                }
+                true;
+              `);
+            } else {
+              requestNativeGPS();
+            }
+          }}
+          renderLoading={() => (
+            <View style={styles.loadingContainer}>
+              <View style={styles.logoCircle}>
+                <Text style={{ fontSize: 32 }}>🏛️</Text>
               </View>
-
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.areaText}>{item.area} • {item.tenantType}</Text>
-
-              <View style={styles.costBadge}>
-                <Text style={styles.costBadgeText}>
-                  Total: ৳{(item.rent + item.utility).toLocaleString()}/mo (Incl. Utils)
-                </Text>
-              </View>
-
-              <View style={styles.buttonRow}>
-                <TouchableOpacity
-                  style={styles.callButton}
-                  onPress={() => handleStartCall(item)}
-                >
-                  <Text style={styles.callButtonText}>In-App Call</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.chatButton}
-                  onPress={() => setSelectedListing(item)}
-                >
-                  <Text style={styles.chatButtonText}>Chat</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.logoText}>
+                ToLet<Text style={{ color: '#c9722d' }}>Nest</Text>
+              </Text>
+              <Text style={styles.loadingSubtitle}>
+                Calibrating GPS & Dhaka Street Engine...
+              </Text>
+              <ActivityIndicator size="large" color="#c9722d" style={{ marginTop: 20 }} />
             </View>
-          </TouchableOpacity>
-        )}
-      />
+          )}
+          onError={() => setHasError(true)}
+          onHttpError={() => setHasError(true)}
+        />
 
-      {/* Modal: In-App Voice Call Screen */}
-      <Modal visible={isCalling} transparent animationType="slide">
-        <View style={styles.callModalContainer}>
-          <View style={styles.callModalContent}>
-            <View style={styles.avatarCircle}>
-              <Text style={{ fontSize: 32, color: '#c9722d' }}>🏛️</Text>
-            </View>
-            <Text style={styles.callerName}>{activeCall?.landlord}</Text>
-            <Text style={styles.callerListing}>{activeCall?.title}</Text>
-            <Text style={styles.callStatus}>
-              Connected (00:{callTimer < 10 ? `0${callTimer}` : callTimer})
+        {/* Offline / Reconnect Fallback */}
+        {hasError && (
+          <View style={styles.errorContainer}>
+            <Text style={{ fontSize: 36 }}>📡</Text>
+            <Text style={styles.errorTitle}>Connection Failed</Text>
+            <Text style={styles.errorText}>
+              Ensure your phone and PC are on the same Wi-Fi and Next.js is running at {DEV_SERVER_URL}.
             </Text>
-            <Text style={styles.privacyShieldText}>🔒 Privacy Shield: Number Hidden</Text>
-
-            <TouchableOpacity style={styles.endCallButton} onPress={handleEndCall}>
-              <Text style={styles.endCallButtonText}>End Call</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+              <Text style={styles.retryButtonText}>🔄 Reconnect</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#14120f',
   },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#29241f',
-    backgroundColor: '#1a1714',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: -0.5,
-  },
-  terracottaText: {
-    color: '#c9722d',
-  },
-  headerSubtitle: {
-    fontSize: 11,
-    color: '#b3aba2',
-    marginTop: 2,
-  },
-  listContainer: {
-    padding: 14,
-  },
-  card: {
-    backgroundColor: '#1a1714',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#29241f',
-    overflow: 'hidden',
-    marginBottom: 14,
-  },
-  cardImage: {
-    width: '100%',
-    height: 140,
-  },
-  cardContent: {
-    padding: 12,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  distanceBadge: {
-    backgroundColor: 'rgba(201, 114, 45, 0.15)',
-    color: '#c9722d',
-    fontSize: 11,
-    fontWeight: '700',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  rentText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#ffffff',
-  },
-  cardTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginVertical: 3,
-  },
-  areaText: {
-    fontSize: 11,
-    color: '#7d756c',
-    marginBottom: 6,
-  },
-  costBadge: {
-    backgroundColor: 'rgba(201, 114, 45, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(201, 114, 45, 0.3)',
-    borderRadius: 6,
-    padding: 5,
-    marginBottom: 8,
-  },
-  costBadgeText: {
-    fontSize: 10,
-    color: '#c9722d',
-    fontWeight: '600',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  callButton: {
+  container: {
     flex: 1,
-    backgroundColor: '#221e1a',
-    borderWidth: 1,
-    borderColor: '#3b342d',
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignItems: 'center',
+    backgroundColor: '#14120f',
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : 0,
   },
-  callButtonText: {
-    color: '#c9722d',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  chatButton: {
+  webView: {
     flex: 1,
-    backgroundColor: '#c9722d',
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignItems: 'center',
+    backgroundColor: '#14120f',
   },
-  chatButtonText: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  callModalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(10,8,6,0.88)',
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#14120f',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    zIndex: 100,
   },
-  callModalContent: {
-    width: '100%',
-    maxWidth: 300,
+  logoCircle: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     backgroundColor: '#1a1714',
-    borderRadius: 16,
-    padding: 22,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#3b342d',
-  },
-  avatarCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#221e1a',
+    borderWidth: 2,
+    borderColor: '#c9722d',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#c9722d',
+    marginBottom: 12,
   },
-  callerName: {
-    fontSize: 16,
+  logoText: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: -0.5,
+  },
+  loadingSubtitle: {
+    fontSize: 12,
+    color: '#b3aba2',
+    marginTop: 6,
+  },
+  errorContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#14120f',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 30,
+    zIndex: 200,
+  },
+  errorTitle: {
+    fontSize: 18,
     fontWeight: '800',
     color: '#ffffff',
+    marginTop: 12,
+    marginBottom: 6,
   },
-  callerListing: {
-    fontSize: 11,
-    color: '#c9722d',
-    textAlign: 'center',
-    marginTop: 2,
-    marginBottom: 10,
-  },
-  callStatus: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#9fe3c2',
-    marginBottom: 2,
-  },
-  privacyShieldText: {
-    fontSize: 9,
+  errorText: {
+    fontSize: 12,
     color: '#7d756c',
+    textAlign: 'center',
+    lineHeight: 18,
     marginBottom: 20,
   },
-  endCallButton: {
-    backgroundColor: '#944138',
+  retryButton: {
+    backgroundColor: '#c9722d',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
   },
-  endCallButtonText: {
+  retryButtonText: {
     color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 12,
+    fontWeight: '800',
+    fontSize: 13,
   },
 });

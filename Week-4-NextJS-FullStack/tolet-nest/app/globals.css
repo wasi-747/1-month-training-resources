@@ -1,50 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Warm Charcoal & Espresso Canvas (Dhaka Grounded Palette) */
-  --bg-main: #14120f;
-  --bg-surface-1: #1a1714;
-  --bg-surface-2: #221e1a;
-  --bg-surface-3: #2c2621;
-  --bg-surface-hover: #352e27;
+  /* Modern High-End Deep Obsidian Navy & Slate Canvas */
+  --bg-main: #080c14;
+  --bg-surface-1: #0f172a;
+  --bg-surface-2: #1e293b;
+  --bg-surface-3: #334155;
+  --bg-surface-hover: #243248;
 
-  /* Signature Brand Accent: Warm Terracotta / Heritage Ochre-Clay */
-  --brand-primary: #c9722d;
-  --brand-primary-hover: #dc7f35;
-  --brand-primary-subtle: rgba(201, 114, 45, 0.14);
-  --brand-primary-border: rgba(201, 114, 45, 0.38);
+  /* Signature Brand Accent: Vibrant Electric Emerald */
+  --brand-primary: #10b981;
+  --brand-primary-hover: #059669;
+  --brand-primary-subtle: rgba(16, 185, 129, 0.14);
+  --brand-primary-border: rgba(16, 185, 129, 0.35);
 
-  /* Secondary Complement: Muted Forest Sage */
-  --brand-sage: #3d785d;
-  --brand-sage-subtle: rgba(61, 120, 93, 0.18);
+  /* Warm Gold / Amber Accent for Pricing & Taka Symbols */
+  --brand-amber: #f59e0b;
+  --brand-amber-hover: #d97706;
+  --brand-amber-subtle: rgba(245, 158, 11, 0.14);
+  --brand-amber-border: rgba(245, 158, 11, 0.35);
 
-  /* Refined Status Palette (Muted, Desaturated, Non-Arcade) */
-  --status-available-bg: rgba(45, 90, 70, 0.28);
-  --status-available-border: rgba(61, 120, 93, 0.45);
-  --status-available-text: #9fe3c2;
+  /* Status Colors */
+  --status-available-bg: rgba(16, 185, 129, 0.2);
+  --status-available-border: rgba(16, 185, 129, 0.45);
+  --status-available-text: #34d399;
 
-  --status-scheduled-bg: rgba(154, 107, 47, 0.25);
-  --status-scheduled-border: rgba(154, 107, 47, 0.45);
-  --status-scheduled-text: #f6cd8b;
+  --status-scheduled-bg: rgba(245, 158, 11, 0.2);
+  --status-scheduled-border: rgba(245, 158, 11, 0.45);
+  --status-scheduled-text: #fbbf24;
 
-  --status-rented-bg: rgba(148, 65, 56, 0.25);
-  --status-rented-border: rgba(148, 65, 56, 0.45);
-  --status-rented-text: #fca5a5;
+  --status-rented-bg: rgba(239, 68, 68, 0.2);
+  --status-rented-border: rgba(239, 68, 68, 0.45);
+  --status-rented-text: #f87171;
 
-  /* Typography Colors */
-  --text-primary: #f6f3ee;
-  --text-secondary: #b3aba2;
-  --text-muted: #7d756c;
-  --text-inverse: #14120f;
+  /* Typography Colors (High Contrast, Human-Crafted) */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #080c14;
 
   /* Borders & Dividers */
-  --border-subtle: #29241f;
-  --border-medium: #3b342d;
-  --border-active: #c9722d;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-active: #10b981;
 
   /* Shadows */
-  --shadow-card: 0 8px 24px rgba(6, 5, 4, 0.45);
-  --shadow-featured: 0 16px 40px rgba(6, 5, 4, 0.65), 0 0 0 1px rgba(201, 114, 45, 0.25);
+  --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --shadow-featured: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.3);
   --shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.85);
 }
 
@@ -383,3 +385,43 @@ h1, h2, h3, h4, .font-heading {
   background: #332d27;
   border-radius: 2px;
 }
+
+/* Fullscreen Mobile View when running on physical phones / mobile WebView */
+@media (max-width: 600px) {
+  .smartphone-frame {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .smartphone-notch {
+    display: none !important;
+  }
+}
+
+/* 🔔 In-App Toast & Modal Animations */
+@keyframes slideDownToast {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scaleUpModal {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+

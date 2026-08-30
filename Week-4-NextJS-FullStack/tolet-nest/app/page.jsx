@@ -17,9 +17,30 @@ import {
 
 export default function Home() {
   const [viewMode, setViewMode] = useState('split'); // 'split' | 'mobile' | 'landlord'
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastSyncTime, setLastSyncTime] = useState('Just now');
+
+  // Auto-detect mobile devices and small screens
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkMobile = () => {
+        const isMobileScreen = window.innerWidth <= 820;
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+        const mobile = isMobileScreen || isMobileUA;
+        setIsMobileDevice(mobile);
+        if (mobile) {
+          setViewMode('mobile');
+        }
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
+  }, []);
 
   // Fetch listings from API
   const fetchListings = async () => {
@@ -87,6 +108,20 @@ export default function Home() {
     }
   };
 
+  // 📱 IF ACCESSED FROM MOBILE PHONE: Render ONLY the 100% Fullscreen Student App!
+  if (isMobileDevice) {
+    return (
+      <div style={{ minHeight: '100vh', width: '100vw', background: '#14120f', overflow: 'hidden' }}>
+        <MobileAppSimulator
+          listings={listings}
+          onRefresh={fetchListings}
+          isNativeMobile={true}
+        />
+      </div>
+    );
+  }
+
+  // 💻 IF ACCESSED FROM DESKTOP / PC: Render Full Dual Desktop Showcase
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-main)' }}>
       {/* Top Navbar */}
@@ -104,7 +139,7 @@ export default function Home() {
           gap: '14px',
         }}
       >
-        {/* Brand Logo & Wordmark (Custom Monoline Architectural Motif) */}
+        {/* Brand Logo & Wordmark */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div
             style={{
@@ -118,7 +153,6 @@ export default function Home() {
               justifyContent: 'center',
             }}
           >
-            {/* Custom Monoline Architectural Nest Glyph */}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 10.5L12 3l9 7.5v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20v-9.5z" />
               <path d="M9 21v-7h6v7" />
@@ -149,7 +183,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* View Switcher Pill (Segmented Control) */}
+        {/* View Switcher Pill */}
         <div
           style={{
             background: 'var(--bg-surface-1)',
@@ -199,7 +233,7 @@ export default function Home() {
               transition: 'all 0.15s ease',
             }}
           >
-            <Smartphone size={14} /> Tenant Mobile App
+            <Smartphone size={14} /> Student / Tenant Mobile App
           </button>
 
           <button
@@ -220,11 +254,11 @@ export default function Home() {
               transition: 'all 0.15s ease',
             }}
           >
-            <Building2 size={14} /> Landlord Web Portal
+            <Building2 size={14} /> Super Admin & Web Control Portal
           </button>
         </div>
 
-        {/* Live Ecosystem Sync Indicator (Pulse Animation) */}
+        {/* Live Ecosystem Sync Indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div
             style={{
@@ -247,7 +281,7 @@ export default function Home() {
 
       {/* Main Content Body */}
       <main style={{ flex: 1, padding: '24px 20px' }}>
-        {/* Split View (Side-by-Side Live Showcase) */}
+        {/* Split View */}
         {viewMode === 'split' && (
           <div
             style={{

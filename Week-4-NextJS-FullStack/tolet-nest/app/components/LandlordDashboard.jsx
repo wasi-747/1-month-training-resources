@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Building,
   PlusCircle,
@@ -12,42 +12,68 @@ import {
   Zap,
   Droplet,
   Wifi,
-  DollarSign,
   Phone,
   MessageSquare,
   CheckCircle2,
   AlertCircle,
-  Sliders
+  Sliders,
+  Users,
+  GraduationCap,
+  Sparkles,
+  Search,
+  Eye,
+  Lock,
+  PhoneCall,
+  Activity,
+  SlidersHorizontal,
+  Home
 } from 'lucide-react';
+import { mockStore } from '../../lib/mockStore';
 
-export default function LandlordDashboard({ listings, onRefresh, onPostListing, onUpdateStatus, onDeleteListing }) {
+export default function LandlordDashboard({
+  listings = [],
+  onRefresh,
+  onPostListing,
+  onUpdateStatus,
+  onDeleteListing,
+}) {
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('listings'); // 'listings' | 'inquiries'
-  const [replyText, setReplyText] = useState('');
+  const [activeTab, setActiveTab] = useState('metrics'); // 'metrics' | 'directory' | 'privacy_logs'
+  const [directorySearch, setDirectorySearch] = useState('');
+  const [directoryCategory, setDirectoryCategory] = useState('all');
+  const [flaggedIds, setFlaggedIds] = useState([]);
+  const [verifiedIds, setVerifiedIds] = useState(['listing-1', 'listing-2', 'listing-7', 'listing-9']);
+
+  // Ensure robust data source fallback
+  const fallbackListings = useMemo(() => mockStore.getListings({}), []);
+  const activeListings = listings && listings.length > 0 ? listings : fallbackListings;
 
   // New Listing Form State
   const [formData, setFormData] = useState({
+    posterRole: 'student_outgoing', // 'student_outgoing' | 'flatmate' | 'sublet_host' | 'landlord'
+    rentalCategory: 'seat', // 'seat' | 'room' | 'dining_space' | 'sublet' | 'full_flat'
+    quantityAvailable: 1,
     title: '',
     description: '',
-    rentAmount: 8500,
+    rentAmount: 3800,
     area: 'Bashundhara R/A',
     addressText: '',
-    propertyType: 'single_room',
+    propertyType: 'seat_rent',
     tenantType: 'bachelor_male',
-    utilityMode: 'itemized', // 'itemized' | 'inclusive' | 'contact'
+    utilityMode: 'itemized',
     utilityBreakdown: {
-      electricity: 500,
-      gas: 250,
-      water: 150,
-      serviceCharge: 250,
-      wifi: 150,
-      waste: 50,
+      electricity: 350,
+      gas: 150,
+      water: 100,
+      serviceCharge: 150,
+      wifi: 100,
+      waste: 0,
     },
-    inclusiveUtilityAmount: 1200,
-    amenities: ['wifi', 'attached_bath', 'no_curfew'],
+    inclusiveUtilityAmount: 850,
+    amenities: ['wifi', 'attached_bath', 'no_curfew', 'gas'],
     showPublicPhone: false,
     phone: '01711-234567',
-    landlordName: 'Engr. Rafiqul Islam',
+    posterName: 'Tanvir Ahmed (Outgoing Student)',
   });
 
   const amenitiesList = [
@@ -107,11 +133,13 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
 
     const payload = {
       title: formData.title,
-      description: formData.description,
+      description: formData.description || `Posted via ToLetNest Portal by ${formData.posterName}. In-app communication channel active.`,
       rentAmount: Number(formData.rentAmount),
       area: formData.area,
       addressText: formData.addressText,
       propertyType: formData.propertyType,
+      rentalCategory: formData.rentalCategory,
+      quantityAvailable: Number(formData.quantityAvailable) || 1,
       tenantType: formData.tenantType,
       utilityInfo: {
         mode: formData.utilityMode,
@@ -122,7 +150,7 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
       amenities: formData.amenities,
       status: 'available',
       landlord: {
-        name: formData.landlordName,
+        name: formData.posterName,
         phone: formData.phone,
         showPublicPhone: formData.showPublicPhone,
         allowInAppCall: true,
@@ -130,7 +158,7 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
       },
     };
 
-    onPostListing(payload);
+    if (onPostListing) onPostListing(payload);
     setShowModal(false);
     setFormData((prev) => ({
       ...prev,
@@ -141,15 +169,54 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
   };
 
   // Metrics
-  const totalCount = listings.length;
-  const availableCount = listings.filter((l) => l.status === 'available').length;
-  const rentedCount = listings.filter((l) => l.status === 'rented').length;
-  const avgRent =
-    totalCount > 0 ? Math.round(listings.reduce((sum, l) => sum + l.rentAmount, 0) / totalCount) : 0;
+  const totalCount = activeListings.length;
+  const availableCount = activeListings.filter((l) => l.status === 'available').length;
+  const rentedCount = activeListings.filter((l) => l.status === 'rented').length;
+  const totalVolume = activeListings.reduce((sum, l) => sum + (l.rentAmount || 0), 0);
+  const avgRent = totalCount > 0 ? Math.round(totalVolume / totalCount) : 0;
+
+  // Campus Hub Statistics
+  const campusHubs = [
+    { name: 'Bashundhara R/A', univ: 'NSU / IUB / AIUB', count: activeListings.filter((l) => l.area === 'Bashundhara R/A').length, icon: '🎓' },
+    { name: 'Middle Badda', univ: 'BRAC University Link Rd', count: activeListings.filter((l) => l.area === 'Badda').length, icon: '🎓' },
+    { name: 'Aftabnagar', univ: 'East West University', count: activeListings.filter((l) => l.area === 'Aftabnagar').length, icon: '🎓' },
+    { name: 'Saidnagar 100ft', univ: 'Budget Student Mess & Beds', count: activeListings.filter((l) => l.area === 'Saidnagar').length, icon: '🍽️' },
+    { name: 'Dhanmondi / Mirpur', univ: 'Daffodil / UIU / Metro Corridor', count: activeListings.filter((l) => ['Dhanmondi', 'Mirpur'].includes(l.area)).length, icon: '🏢' },
+  ];
+
+  // Directory Filtered
+  const directoryFiltered = activeListings.filter((item) => {
+    if (directorySearch) {
+      const q = directorySearch.toLowerCase();
+      const match =
+        item.title.toLowerCase().includes(q) ||
+        item.area.toLowerCase().includes(q) ||
+        item.addressText.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    if (directoryCategory !== 'all') {
+      const pType = item.propertyType || '';
+      const rCat = item.rentalCategory || '';
+      if (directoryCategory === 'seat' && pType !== 'seat_rent' && pType !== 'shared_seat' && rCat !== 'seat') return false;
+      if (directoryCategory === 'dining_space' && pType !== 'dining_space' && rCat !== 'dining_space') return false;
+      if (directoryCategory === 'sublet' && pType !== 'sublet' && rCat !== 'sublet') return false;
+      if (directoryCategory === 'full_flat' && pType !== 'full_flat' && rCat !== 'full_flat') return false;
+      if (directoryCategory === 'room' && !['room_rent', 'single_room', 'master_bed'].includes(pType) && rCat !== 'room') return false;
+    }
+    return true;
+  });
+
+  const toggleFlag = (id) => {
+    setFlaggedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  };
+
+  const toggleVerify = (id) => {
+    setVerifiedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  };
 
   return (
-    <div style={{ maxWidth: '1100px' }}>
-      {/* Top Header */}
+    <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
+      {/* Top Super Admin Header */}
       <div
         style={{
           display: 'flex',
@@ -162,24 +229,40 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span style={{ fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Management Portal
+            <span
+              style={{
+                background: 'rgba(201, 114, 45, 0.15)',
+                border: '1px solid var(--brand-primary-border)',
+                borderRadius: '4px',
+                padding: '2px 8px',
+                fontSize: '0.7rem',
+                fontFamily: 'Space Grotesk',
+                fontWeight: 800,
+                color: 'var(--brand-primary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              <Shield size={11} /> Master Control & Super Admin Portal
             </span>
           </div>
-          <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#fff' }}>
-            Landlord & Property Manager
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+            ToLet<span style={{ color: 'var(--brand-primary)' }}>Nest</span> Platform Command Center
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginTop: '4px' }}>
-            Post To-Lets, configure transparent utility costs, and manage privacy-protected tenant inquiries.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.86rem', marginTop: '4px' }}>
+            Live Dhaka rental moderation, university hub analytics, P2P vacancy tracking & privacy audit.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={onRefresh} className="btn-surface" title="Refresh Live Database">
-            <RefreshCw size={14} style={{ color: 'var(--brand-primary)' }} /> Sync
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button onClick={onRefresh} className="btn-surface" title="Sync with Cloud Database">
+            <RefreshCw size={14} style={{ color: 'var(--brand-primary)' }} /> Live Sync
           </button>
           <button onClick={() => setShowModal(true)} className="btn-terracotta">
-            <PlusCircle size={16} /> Post To-Let
+            <PlusCircle size={16} /> + Post To-Let / Seat
           </button>
         </div>
       </div>
@@ -195,546 +278,735 @@ export default function LandlordDashboard({ listings, onRefresh, onPostListing, 
       >
         <div className="card-surface" style={{ padding: '18px' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Total Units
+            Total Live Listings
           </span>
-          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', marginTop: '4px' }}>
+          <p className="font-heading" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#fff', marginTop: '4px' }}>
             {totalCount}
           </p>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Listed across Dhaka</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.74rem' }}>Across 7 Dhaka Student Hubs</span>
         </div>
 
-        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid var(--brand-sage)' }}>
+        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid #4ade80' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Vacant & Available
           </span>
-          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-available-text)', marginTop: '4px' }}>
+          <p className="font-heading" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#4ade80', marginTop: '4px' }}>
             {availableCount}
           </p>
-          <span style={{ color: 'var(--brand-sage)', fontSize: '0.75rem' }}>Ready for move-in</span>
+          <span style={{ color: '#9fe3c2', fontSize: '0.74rem' }}>Ready for instant move-in</span>
         </div>
 
-        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid #7c352d' }}>
+        <div className="card-surface" style={{ padding: '18px', borderLeft: '3px solid #f6cd8b' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Rented / Occupied
+            Monthly Rental Volume
           </span>
-          <p className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-rented-text)', marginTop: '4px' }}>
-            {rentedCount}
+          <p className="font-heading font-mono" style={{ fontSize: '1.85rem', fontWeight: 800, color: '#f6cd8b', marginTop: '4px' }}>
+            <span className="taka-symbol">৳</span>{(totalVolume / 1000).toFixed(1)}k
           </p>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Inquiries paused</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>Monthly turnover volume</span>
         </div>
 
         <div className="card-surface-elevated" style={{ padding: '18px', borderLeft: '3px solid var(--brand-primary)' }}>
           <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Average Base Rent
+            Privacy Shield Rate
           </span>
-          <p className="font-heading font-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-primary)', marginTop: '4px' }}>
-            <span className="taka-symbol">৳</span>{avgRent.toLocaleString()}
+          <p className="font-heading font-mono" style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--brand-primary)', marginTop: '4px' }}>
+            100%
           </p>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Excluding utilities</span>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.74rem' }}>Zero Direct SIM Number Leaks</span>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Navigation Tabs */}
       <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '18px' }}>
-        <button
-          onClick={() => setActiveTab('listings')}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: '10px 16px',
-            color: activeTab === 'listings' ? 'var(--brand-primary)' : 'var(--text-secondary)',
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontWeight: 700,
-            fontSize: '0.88rem',
-            borderBottom: activeTab === 'listings' ? '2px solid var(--brand-primary)' : '2px solid transparent',
-            cursor: 'pointer',
-          }}
-        >
-          Active Listings ({listings.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('inquiries')}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: '10px 16px',
-            color: activeTab === 'inquiries' ? 'var(--brand-primary)' : 'var(--text-secondary)',
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontWeight: 700,
-            fontSize: '0.88rem',
-            borderBottom: activeTab === 'inquiries' ? '2px solid var(--brand-primary)' : '2px solid transparent',
-            cursor: 'pointer',
-          }}
-        >
-          Tenant Inquiries & Call Logs
-        </button>
+        {[
+          { id: 'metrics', label: '📊 Campus Hubs & Heatmap' },
+          { id: 'directory', label: `🗂️ Listing Moderation Directory (${totalCount})` },
+          { id: 'privacy_logs', label: '🔒 Privacy Shield & Call Audit' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '10px 16px',
+              color: activeTab === tab.id ? 'var(--brand-primary)' : 'var(--text-secondary)',
+              fontFamily: 'Space Grotesk, sans-serif',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              borderBottom: activeTab === tab.id ? '2px solid var(--brand-primary)' : '2px solid transparent',
+              cursor: 'pointer',
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Tab 1: Listings Table */}
-      {activeTab === 'listings' && (
-        <div className="card-surface" style={{ overflowX: 'auto', borderRadius: '12px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-            <thead>
-              <tr style={{ background: 'var(--bg-surface-2)', borderBottom: '1px solid var(--border-subtle)' }}>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Property Details</th>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Area & Type</th>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Base Rent</th>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Utility Charges</th>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status</th>
-                <th style={{ padding: '12px 16px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {listings.map((item) => (
-                <tr
-                  key={item._id}
-                  style={{
-                    borderBottom: '1px solid var(--border-subtle)',
-                    transition: 'background 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-2)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <td style={{ padding: '14px 16px', maxWidth: '280px' }}>
-                    <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.92rem' }}>{item.title}</p>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <MapPin size={12} style={{ color: 'var(--brand-primary)' }} /> {item.addressText}
-                    </p>
-                  </td>
-                  <td style={{ padding: '14px 16px' }}>
-                    <p style={{ fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'Space Grotesk' }}>{item.area}</p>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.76rem', textTransform: 'capitalize' }}>
-                      {item.propertyType.replace('_', ' ')} • {item.tenantType.replace('_', ' ')}
-                    </p>
-                  </td>
-                  <td style={{ padding: '14px 16px', fontWeight: 700, color: '#fff' }} className="font-mono">
-                    <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
-                  </td>
-                  <td style={{ padding: '14px 16px' }}>
-                    {item.utilityInfo?.mode === 'itemized' && (
-                      <div>
-                        <span className="font-mono" style={{ fontWeight: 700, color: 'var(--brand-primary)', fontSize: '0.85rem' }}>
-                          +<span className="taka-symbol">৳</span>{(item.utilityInfo.totalUtility || 0).toLocaleString()}
-                        </span>
-                        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Itemized</p>
-                      </div>
-                    )}
-                    {item.utilityInfo?.mode === 'inclusive' && (
-                      <span className="font-mono" style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 600 }}>
-                        +<span className="taka-symbol">৳</span>{(item.utilityInfo.totalUtility || 0).toLocaleString()} (Fixed)
-                      </span>
-                    )}
-                    {item.utilityInfo?.mode === 'contact' && (
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>Negotiable</span>
-                    )}
-                  </td>
-                  <td style={{ padding: '14px 16px' }}>
-                    {item.status === 'available' && <span className="status-chip status-chip-available">● Available</span>}
-                    {item.status === 'visit_scheduled' && <span className="status-chip status-chip-scheduled">● Visit Booked</span>}
-                    {item.status === 'rented' && <span className="status-chip status-chip-rented">● Rented</span>}
-                  </td>
-                  <td style={{ padding: '14px 16px', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '8px' }}>
-                      <button
-                        onClick={() =>
-                          onUpdateStatus(
-                            item._id,
-                            item.status === 'available' ? 'rented' : 'available'
-                          )
-                        }
-                        className="btn-surface"
-                        style={{ fontSize: '0.75rem', padding: '4px 10px' }}
-                      >
-                        {item.status === 'available' ? 'Set Rented' : 'Set Available'}
-                      </button>
-                      <button
-                        onClick={() => onDeleteListing(item._id)}
-                        className="btn-danger-subtle"
-                        style={{ padding: '4px 8px' }}
-                        title="Delete listing"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Tab 2: Inquiries Inbox */}
-      {activeTab === 'inquiries' && (
-        <div className="card-surface" style={{ padding: '22px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Shield size={18} style={{ color: 'var(--brand-sage)' }} />
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff' }}>
-              Privacy-Preserving Inquiry Inbox
+      {/* ========================================================================= */}
+      {/* TAB 1: 📊 CAMPUS HUBS & HEATMAP                                           */}
+      {/* ========================================================================= */}
+      {activeTab === 'metrics' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          {/* University Hub Distribution Cards */}
+          <div>
+            <h3 className="font-heading" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', marginBottom: '12px' }}>
+              📍 Live Dhaka University Hub Vacancy Distribution
             </h3>
-          </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '18px' }}>
-            Incoming messages from verified student tenants in Dhaka. Personal phone numbers remain masked to prevent spam.
-          </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+              {campusHubs.map((hub) => (
+                <div
+                  key={hub.name}
+                  className="card-surface"
+                  style={{
+                    padding: '16px',
+                    borderRadius: '10px',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{hub.icon}</span>
+                      <span
+                        style={{
+                          background: hub.count > 0 ? 'rgba(74, 222, 128, 0.15)' : 'var(--bg-surface-2)',
+                          color: hub.count > 0 ? '#4ade80' : 'var(--text-muted)',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '0.72rem',
+                          fontFamily: 'Space Grotesk',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {hub.count} {hub.count === 1 ? 'Unit' : 'Units'} Live
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff' }}>{hub.name}</h4>
+                    <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{hub.univ}</p>
+                  </div>
 
+                  <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Status: Active Radar</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--brand-primary)', fontWeight: 700 }}>● Online</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Platform Architecture & Innovation Overview */}
           <div
             style={{
               background: 'var(--bg-surface-2)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '10px',
-              padding: '16px',
+              border: '1px solid var(--border-medium)',
+              borderRadius: '12px',
+              padding: '18px 20px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '10px' }}>
-              <div>
-                <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.92rem' }}>Wasiur Rahman (Student Tenant)</span>
-                <p style={{ fontSize: '0.76rem', color: 'var(--brand-primary)', marginTop: '2px' }}>
-                  Inquiry on: Bachelor Master Bed (Bashundhara R/A Block C)
-                </p>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <Shield size={16} style={{ color: 'var(--brand-primary)' }} />
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>Anti-Broker & Anti-Spam Guard</h4>
               </div>
-              <span className="status-chip status-chip-available">● Active Thread</span>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Direct peer-to-peer connection prevents third-party middlemen from inflating rent prices. Personal SIM numbers are masked by default.
+              </p>
             </div>
 
-            {/* Simulated Chat Messages */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', margin: '14px 0', maxHeight: '200px', overflowY: 'auto' }}>
-              <div className="animate-message" style={{ alignSelf: 'flex-start', background: 'var(--bg-surface-3)', border: '1px solid var(--border-subtle)', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
-                Assalamu Alaikum Uncle, is the master bed room still available for September?
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <Zap size={16} style={{ color: '#f6cd8b' }} />
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>Zero-Google-API GPS Proximity</h4>
               </div>
-
-              <div className="animate-message" style={{ alignSelf: 'flex-end', background: 'var(--brand-primary)', color: '#fff', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.72rem', marginBottom: '2px' }}>You (Landlord)</p>
-                Walaikum Assalam. Yes Baba, it is available. Are you studying at NSU?
-              </div>
-
-              <div className="animate-message" style={{ alignSelf: 'flex-start', background: 'var(--bg-surface-3)', border: '1px solid var(--border-subtle)', padding: '10px 14px', borderRadius: '10px', maxWidth: '75%', fontSize: '0.85rem' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '2px' }}>Wasiur (Tenant)</p>
-                Yes Uncle, I am in my final semester. Is night entry allowed after 11 PM for lab projects?
-              </div>
-
-              <div style={{ alignSelf: 'center', background: 'var(--brand-sage-subtle)', color: 'var(--status-available-text)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', border: '1px solid var(--status-available-border)' }}>
-                📞 In-App Voice Call Completed (1m 34s) • Zero Phone Number Exposure
-              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Built entirely using native HTML5 Geolocation and Haversine trigonometry algorithms—delivering 100% free, hyper-accurate distance calculation.
+              </p>
             </div>
 
-            {/* Quick Reply Bar */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-              <input
-                type="text"
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Type in-app reply to student..."
-                style={{
-                  flex: 1,
-                  background: 'var(--bg-main)',
-                  border: '1px solid var(--border-subtle)',
-                  color: '#fff',
-                  padding: '9px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.85rem',
-                }}
-              />
-              <button
-                onClick={() => {
-                  if (replyText) {
-                    alert(`Reply sent: "${replyText}"`);
-                    setReplyText('');
-                  }
-                }}
-                className="btn-terracotta"
-              >
-                Send Reply
-              </button>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <Sparkles size={16} style={{ color: '#9fe3c2' }} />
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>Transparent Utility Calculation</h4>
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Itemized breakdown for electricity, gas, water, service charge, and optic WiFi—eliminating hidden costs for university students.
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal: 1-Minute Smart Listing Form */}
+      {/* ========================================================================= */}
+      {/* TAB 2: 🗂️ LISTING MODERATION & DIRECTORY                                  */}
+      {/* ========================================================================= */}
+      {activeTab === 'directory' && (
+        <div>
+          {/* Search & Category Filter Bar */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+            <div
+              style={{
+                flex: 1,
+                minWidth: '220px',
+                background: 'var(--bg-surface-1)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Search size={14} style={{ color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                value={directorySearch}
+                onChange={(e) => setDirectorySearch(e.target.value)}
+                placeholder="Filter by title, area, or landmark..."
+                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '0.84rem', outline: 'none', width: '100%' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto' }}>
+              {[
+                { id: 'all', label: 'All Units' },
+                { id: 'seat', label: '🛏️ Seat Rent' },
+                { id: 'room', label: '🚪 Room Rent' },
+                { id: 'dining_space', label: '🍽️ Dining Space' },
+                { id: 'sublet', label: '🏡 Sublet' },
+                { id: 'full_flat', label: '🏢 Full Flat' },
+              ].map((chip) => (
+                <button
+                  key={chip.id}
+                  onClick={() => setDirectoryCategory(chip.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.74rem',
+                    fontFamily: 'Space Grotesk',
+                    fontWeight: 700,
+                    background: directoryCategory === chip.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                    color: directoryCategory === chip.id ? '#fff' : 'var(--text-secondary)',
+                    border: `1px solid ${directoryCategory === chip.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Directory Table */}
+          <div className="card-surface" style={{ overflowX: 'auto', borderRadius: '12px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+              <thead>
+                <tr style={{ background: 'var(--bg-surface-2)', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <th style={{ padding: '12px 14px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.76rem', textTransform: 'uppercase' }}>Property & Landmark</th>
+                  <th style={{ padding: '12px 14px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.76rem', textTransform: 'uppercase' }}>Category & Poster</th>
+                  <th style={{ padding: '12px 14px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.76rem', textTransform: 'uppercase' }}>Rent + Utility</th>
+                  <th style={{ padding: '12px 14px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.76rem', textTransform: 'uppercase' }}>Status</th>
+                  <th style={{ padding: '12px 14px', color: 'var(--text-muted)', fontFamily: 'Space Grotesk', fontSize: '0.76rem', textTransform: 'uppercase', textAlign: 'right' }}>Admin Controls</th>
+                </tr>
+              </thead>
+              <tbody>
+                {directoryFiltered.map((item) => {
+                  const isFlagged = flaggedIds.includes(item._id);
+                  const isVerified = verifiedIds.includes(item._id);
+                  const isSeat = item.rentalCategory === 'seat' || item.propertyType === 'seat_rent';
+                  const isDining = item.rentalCategory === 'dining_space' || item.propertyType === 'dining_space';
+                  const isFlat = item.rentalCategory === 'full_flat' || item.propertyType === 'full_flat';
+
+                  return (
+                    <tr
+                      key={item._id}
+                      style={{
+                        borderBottom: '1px solid var(--border-subtle)',
+                        background: isFlagged ? 'rgba(148, 65, 56, 0.15)' : 'transparent',
+                        transition: 'background 0.15s ease',
+                      }}
+                    >
+                      <td style={{ padding: '12px 14px', maxWidth: '280px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <p style={{ fontWeight: 700, color: '#fff', fontSize: '0.88rem' }}>{item.title}</p>
+                          {isVerified && (
+                            <span title="Student/Owner Verified Badge" style={{ color: '#4ade80', fontSize: '0.75rem' }}>✓</span>
+                          )}
+                        </div>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <MapPin size={11} style={{ color: 'var(--brand-primary)' }} /> {item.addressText || item.area}
+                        </p>
+                      </td>
+
+                      <td style={{ padding: '12px 14px' }}>
+                        <span
+                          style={{
+                            background: isSeat ? 'rgba(74, 222, 128, 0.15)' : isDining ? 'rgba(246, 205, 139, 0.15)' : 'var(--bg-surface-2)',
+                            color: isSeat ? '#4ade80' : isDining ? '#f6cd8b' : '#fff',
+                            border: '1px solid var(--border-subtle)',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontFamily: 'Space Grotesk',
+                            fontWeight: 700,
+                            display: 'inline-block',
+                            marginBottom: '3px',
+                          }}
+                        >
+                          {isSeat ? '🛏️ Seat Rent' : isDining ? '🍽️ Dining Space' : isFlat ? '🏢 Full Flat' : '🚪 Room Rent'}
+                        </span>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          By {item.landlord?.name || 'Student / Host'}
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '12px 14px' }}>
+                        <span className="font-mono" style={{ fontWeight: 800, color: 'var(--brand-primary)', fontSize: '0.88rem' }}>
+                          <span className="taka-symbol">৳</span>{item.rentAmount.toLocaleString()}
+                        </span>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          + ৳{(item.utilityInfo?.totalUtility || 0).toLocaleString()} bills
+                        </div>
+                      </td>
+
+                      <td style={{ padding: '12px 14px' }}>
+                        <button
+                          onClick={() => onUpdateStatus && onUpdateStatus(item._id, item.status === 'available' ? 'rented' : 'available')}
+                          style={{
+                            background: item.status === 'available' ? 'rgba(74, 222, 128, 0.15)' : 'rgba(148, 65, 56, 0.15)',
+                            color: item.status === 'available' ? '#4ade80' : '#f87171',
+                            border: `1px solid ${item.status === 'available' ? 'rgba(74, 222, 128, 0.3)' : 'rgba(148, 65, 56, 0.3)'}`,
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.7rem',
+                            fontFamily: 'Space Grotesk',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {item.status === 'available' ? '● Available' : '● Rented'}
+                        </button>
+                      </td>
+
+                      <td style={{ padding: '12px 14px', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={() => toggleVerify(item._id)}
+                            style={{
+                              background: isVerified ? 'rgba(74, 222, 128, 0.15)' : 'var(--bg-surface-2)',
+                              border: '1px solid var(--border-subtle)',
+                              color: isVerified ? '#4ade80' : 'var(--text-muted)',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.68rem',
+                              cursor: 'pointer',
+                              fontFamily: 'Space Grotesk',
+                              fontWeight: 700,
+                            }}
+                            title="Toggle Student/ID Verified Status"
+                          >
+                            {isVerified ? '✓ Verified' : 'Verify'}
+                          </button>
+
+                          <button
+                            onClick={() => toggleFlag(item._id)}
+                            style={{
+                              background: isFlagged ? '#944138' : 'var(--bg-surface-2)',
+                              border: '1px solid var(--border-subtle)',
+                              color: isFlagged ? '#fff' : 'var(--text-muted)',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.68rem',
+                              cursor: 'pointer',
+                              fontFamily: 'Space Grotesk',
+                              fontWeight: 700,
+                            }}
+                            title="Flag suspicious/broker listing"
+                          >
+                            {isFlagged ? '🚩 Flagged' : 'Flag'}
+                          </button>
+
+                          {onDeleteListing && (
+                            <button
+                              onClick={() => onDeleteListing(item._id)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#f87171',
+                                padding: '4px',
+                                cursor: 'pointer',
+                              }}
+                              title="Delete from Platform"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 3: 🔒 PRIVACY SHIELD & SECURITY AUDIT                                 */}
+      {/* ========================================================================= */}
+      {activeTab === 'privacy_logs' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div
+            style={{
+              background: 'var(--bg-surface-2)',
+              border: '1px solid var(--brand-primary-border)',
+              borderRadius: '12px',
+              padding: '16px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px',
+            }}
+          >
+            <div>
+              <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Lock size={16} style={{ color: 'var(--brand-primary)' }} /> Live Privacy Shield & Number Masking Engine
+              </h4>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                Protects student flatmates and female students from unwanted persistent SIM calls and harassment.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <span style={{ background: 'rgba(74, 222, 128, 0.15)', color: '#4ade80', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700 }}>
+                ● Audio Gateway: Operational
+              </span>
+              <span style={{ background: 'rgba(201, 114, 45, 0.15)', color: 'var(--brand-primary)', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontFamily: 'Space Grotesk', fontWeight: 700 }}>
+                ● WebRTC Encrypted
+              </span>
+            </div>
+          </div>
+
+          {/* Audit Logs Table */}
+          <div className="card-surface" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+            <div style={{ padding: '12px 16px', background: 'var(--bg-surface-2)', borderBottom: '1px solid var(--border-subtle)', fontWeight: 700, fontSize: '0.84rem', color: '#fff' }}>
+              Recent In-App Communication & Call Logs
+            </div>
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { time: '12 mins ago', type: '📞 Voice Call', target: '1 Seat in Bachelor Room (Near NSU Gate 8)', duration: '1m 24s', status: 'Completed • Masked' },
+                { time: '45 mins ago', type: '💬 In-App Chat', target: 'Female Student Sublet (Aftabnagar Block B)', duration: '4 Messages', status: 'Active Channel' },
+                { time: '2 hours ago', type: '📞 Voice Call', target: 'Bachelor Master Bed (Bashundhara Road 4)', duration: '45s', status: 'Completed • Masked' },
+                { time: '3 hours ago', type: '🔒 Deal Closed', target: 'Low-Budget Partitioned Dining Space (Saidnagar)', duration: 'Deal Finalized', status: 'Conversation Auto-Closed' },
+              ].map((log, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '10px 12px',
+                    background: 'var(--bg-surface-1)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--brand-primary)' }}>{log.type}</span>
+                    <div>
+                      <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{log.target}</p>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{log.time} • Duration: {log.duration}</span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', color: '#4ade80', fontFamily: 'Space Grotesk', fontWeight: 700 }}>
+                    ✓ {log.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* UNIVERSAL WEB POSTING MODAL (STUDENTS, FLATMATES, LANDLORDS)               */}
+      {/* ========================================================================= */}
       {showModal && (
-        <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div className="glass-modal" style={{ width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', padding: '26px' }}>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(10, 8, 6, 0.82)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            padding: '20px',
+          }}
+        >
+          <div
+            className="card-surface"
+            style={{
+              width: '100%',
+              maxWidth: '620px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '16px',
+              border: '1px solid var(--border-medium)',
+              padding: '24px',
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
               <div>
-                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
-                  Post New To-Let
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-                  Provide clear base rent, transparent utility breakdown, and student criteria.
+                <h3 className="font-heading" style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>
+                  Post To-Let / Vacant Seat
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  Universal Web Posting for Students, Flatmates & Owners
                 </p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ background: 'var(--bg-surface-2)', border: 'none', color: 'var(--text-muted)', width: '30px', height: '30px', borderRadius: '50%', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer' }}
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Posting Role */}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Poster Role Selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '5px' }}>
                   Posting As *
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
                   {[
-                    { id: 'student_outgoing', label: '🎓 Outgoing Student', desc: 'Seat Replacement' },
-                    { id: 'flatmate', label: '🤝 Flatmate', desc: 'Need Roommate' },
-                    { id: 'sublet_host', label: '🏡 Sublet Host', desc: 'Sublet Room' },
-                    { id: 'landlord', label: '🏛️ Landlord', desc: 'Property Owner' },
-                  ].map((role) => (
+                    { id: 'student_outgoing', label: '🎓 Student', desc: 'Seat transfer' },
+                    { id: 'flatmate', label: '🤝 Flatmate', desc: 'Need roommate' },
+                    { id: 'sublet_host', label: '🏡 Host', desc: 'Sublet room' },
+                    { id: 'landlord', label: '🏛️ Owner', desc: 'Full property' },
+                  ].map((r) => (
                     <button
                       type="button"
-                      key={role.id}
-                      onClick={() => setFormData({ ...formData, posterRole: role.id })}
+                      key={r.id}
+                      onClick={() => setFormData({ ...formData, posterRole: r.id })}
                       style={{
-                        background: (formData.posterRole || 'landlord') === role.id ? 'var(--brand-primary)' : 'var(--bg-main)',
-                        color: (formData.posterRole || 'landlord') === role.id ? '#fff' : 'var(--text-secondary)',
-                        border: `1px solid ${(formData.posterRole || 'landlord') === role.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        textAlign: 'left',
+                        background: formData.posterRole === r.id ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
+                        color: formData.posterRole === r.id ? '#fff' : 'var(--text-secondary)',
+                        border: `1px solid ${formData.posterRole === r.id ? 'var(--brand-primary)' : 'var(--border-subtle)'}`,
+                        padding: '6px',
+                        borderRadius: '6px',
+                        textAlign: 'center',
                         cursor: 'pointer',
                       }}
                     >
-                      <p style={{ fontSize: '0.78rem', fontWeight: 700, fontFamily: 'Space Grotesk' }}>{role.label}</p>
-                      <p style={{ fontSize: '0.68rem', opacity: 0.8 }}>{role.desc}</p>
+                      <div style={{ fontSize: '0.74rem', fontWeight: 700 }}>{r.label}</div>
+                      <div style={{ fontSize: '0.62rem', opacity: 0.8 }}>{r.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Title & Area */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
                     Listing Title *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Master Bed with Attached Bath near NSU Gate 2"
+                    placeholder="e.g. 1 Seat Vacant in Bachelor Flat (Near NSU)"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
-                    Dhaka Area *
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Dhaka Zone *
                   </label>
                   <select
                     value={formData.area}
                     onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px', borderRadius: '6px', fontSize: '0.84rem' }}
                   >
                     <option value="Bashundhara R/A">Bashundhara R/A</option>
-                    <option value="Saidnagar">Saidnagar</option>
                     <option value="Badda">Badda</option>
                     <option value="Aftabnagar">Aftabnagar</option>
+                    <option value="Saidnagar">Saidnagar</option>
                     <option value="Gulshan">Gulshan</option>
-                    <option value="Banani">Banani</option>
                     <option value="Dhanmondi">Dhanmondi</option>
                     <option value="Mirpur">Mirpur</option>
                     <option value="Uttara">Uttara</option>
-                    <option value="Mohakhali">Mohakhali</option>
                   </select>
                 </div>
               </div>
 
-              {/* Exact Address */}
+              {/* Address / Landmark */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
-                  Specific Address / Landmark *
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  Specific Address / Road / Landmark *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Road 4, Block C, Bashundhara (Near Gate 2)"
+                  placeholder="e.g. Road 8, Block C, Bashundhara (Opposite NSU Gate 8)"
                   value={formData.addressText}
                   onChange={(e) => setFormData({ ...formData, addressText: e.target.value })}
-                  style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px', fontSize: '0.88rem' }}
+                  style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem' }}
                 />
               </div>
 
-              {/* Room & Tenant Type */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {/* Category & Available Count */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
-                    Room / Accommodation Type
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Rental Type
                   </label>
                   <select
                     value={formData.propertyType}
-                    onChange={(e) => setFormData({ ...formData, propertyType: e.target.value })}
-                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px' }}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      let cat = 'room';
+                      if (val === 'seat_rent') cat = 'seat';
+                      else if (val === 'dining_space') cat = 'dining_space';
+                      else if (val === 'sublet') cat = 'sublet';
+                      else if (val === 'full_flat') cat = 'full_flat';
+                      setFormData({ ...formData, propertyType: val, rentalCategory: cat });
+                    }}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px', borderRadius: '6px', fontSize: '0.84rem' }}
                   >
-                    <option value="seat_rent">🛏️ Seat Rent (১/২/৩ সিট ভাড়া)</option>
-                    <option value="room_rent">🚪 Single Room (রুম ভাড়া)</option>
-                    <option value="master_bed">👑 Master Bed with Attached Bath</option>
-                    <option value="dining_space">🍽️ Dining Space Bed (ডাইনিং স্পেস)</option>
-                    <option value="sublet">🏡 Sublet Room (সাবলেট ভাড়া)</option>
-                    <option value="full_flat">🏢 Entire Full Flat (সম্পূর্ণ ফ্ল্যাট)</option>
+                    <option value="seat_rent">🛏️ Seat Rent (সিট)</option>
+                    <option value="single_room">🚪 Single Room</option>
+                    <option value="master_bed">👑 Master Bed</option>
+                    <option value="dining_space">🍽️ Dining Space</option>
+                    <option value="sublet">🏡 Sublet Room</option>
+                    <option value="full_flat">🏢 Entire Full Flat</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Available Units
+                  </label>
+                  <select
+                    value={formData.quantityAvailable}
+                    onChange={(e) => setFormData({ ...formData, quantityAvailable: Number(e.target.value) })}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px', borderRadius: '6px', fontSize: '0.84rem' }}
+                  >
+                    <option value="1">1 Unit / 1 Seat</option>
+                    <option value="2">2 Units / 2 Seats</option>
+                    <option value="3">3 Units / 3 Seats</option>
+                    <option value="4">4+ Units</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
                     Preferred Tenant
                   </label>
                   <select
                     value={formData.tenantType}
                     onChange={(e) => setFormData({ ...formData, tenantType: e.target.value })}
-                    style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '9px', borderRadius: '8px' }}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px', borderRadius: '6px', fontSize: '0.84rem' }}
                   >
                     <option value="bachelor_male">Bachelor Male</option>
-                    <option value="bachelor_female">Bachelor Female</option>
-                    <option value="student_only">Student Only</option>
-                    <option value="family">Family Only</option>
-                    <option value="any">Open to All</option>
+                    <option value="bachelor_female">Female Student</option>
+                    <option value="job_holder">Job Holder</option>
+                    <option value="family">Family</option>
+                    <option value="any">Anyone</option>
                   </select>
                 </div>
               </div>
 
-              {/* Pricing & Utility Mode */}
-              <div style={{ background: 'var(--bg-surface-2)', padding: '14px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--brand-primary)', marginBottom: '5px' }}>
-                      Monthly Base Rent (BDT ৳) *
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      min="1000"
-                      value={formData.rentAmount}
-                      onChange={(e) => setFormData({ ...formData, rentAmount: e.target.value })}
-                      style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '8px', fontSize: '1rem', fontWeight: 700 }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '5px' }}>
-                      Utility Bills Structure
-                    </label>
-                    <select
-                      value={formData.utilityMode}
-                      onChange={(e) => setFormData({ ...formData, utilityMode: e.target.value })}
-                      style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '8px' }}
-                    >
-                      <option value="itemized">Itemized Breakdown (Transparent)</option>
-                      <option value="inclusive">Fixed Inclusive Bundle</option>
-                      <option value="contact">Contact for Bills</option>
-                    </select>
-                  </div>
+              {/* Monthly Rent & Bills */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Base Rent (৳ / month) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={formData.rentAmount}
+                    onChange={(e) => setFormData({ ...formData, rentAmount: e.target.value })}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem', fontFamily: 'JetBrains Mono' }}
+                  />
                 </div>
-
-                {formData.utilityMode === 'itemized' && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '10px' }}>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Electricity (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.electricity}
-                        onChange={(e) => handleUtilityChange('electricity', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Gas (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.gas}
-                        onChange={(e) => handleUtilityChange('gas', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Water (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.water}
-                        onChange={(e) => handleUtilityChange('water', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Service Charge (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.serviceCharge}
-                        onChange={(e) => handleUtilityChange('serviceCharge', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>WiFi (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.wifi}
-                        onChange={(e) => handleUtilityChange('wifi', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Waste (৳)</span>
-                      <input
-                        type="number"
-                        value={formData.utilityBreakdown.waste}
-                        onChange={(e) => handleUtilityChange('waste', e.target.value)}
-                        style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '5px 8px', borderRadius: '6px', fontSize: '0.82rem' }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ marginTop: '10px', padding: '8px 12px', background: 'var(--brand-primary-subtle)', border: '1px solid var(--brand-primary-border)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#fff' }}>Total Estimated Cost for Tenant:</span>
-                  <span className="font-mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
-                    <span className="taka-symbol">৳</span>{(Number(formData.rentAmount) + calculateTotalUtility()).toLocaleString()}/mo
-                  </span>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Estimated Utilities (৳)
+                  </label>
+                  <input
+                    type="number"
+                    value={calculateTotalUtility()}
+                    readOnly
+                    style={{ width: '100%', background: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', color: 'var(--brand-primary)', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem', fontFamily: 'JetBrains Mono', fontWeight: 700 }}
+                  />
                 </div>
               </div>
 
-              {/* Amenities */}
-              <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                  Amenities & House Rules
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {amenitiesList.map((item) => {
-                    const isSelected = formData.amenities.includes(item.id);
-                    return (
-                      <button
-                        type="button"
-                        key={item.id}
-                        onClick={() => handleAmenityToggle(item.id)}
-                        style={{
-                          background: isSelected ? 'var(--brand-primary)' : 'var(--bg-surface-2)',
-                          color: isSelected ? '#fff' : 'var(--text-secondary)',
-                          border: '1px solid ' + (isSelected ? 'var(--brand-primary)' : 'var(--border-subtle)'),
-                          padding: '5px 10px',
-                          borderRadius: '6px',
-                          fontSize: '0.78rem',
-                          fontFamily: 'Space Grotesk, sans-serif',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
+              {/* Total Monthly Estimated Banner */}
+              <div
+                style={{
+                  background: 'rgba(201, 114, 45, 0.12)',
+                  border: '1px solid var(--brand-primary-border)',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>Total Est. Monthly for Tenant:</span>
+                <span className="font-mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-primary)' }}>
+                  <span className="taka-symbol">৳</span>
+                  {(Number(formData.rentAmount || 0) + calculateTotalUtility()).toLocaleString()} /mo
+                </span>
+              </div>
+
+              {/* Poster Name & Phone */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Your Name / Role
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.posterName}
+                    onChange={(e) => setFormData({ ...formData, posterName: e.target.value })}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                    Contact Phone (Masked by default)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    style={{ width: '100%', background: 'var(--bg-surface-1)', border: '1px solid var(--border-subtle)', color: '#fff', padding: '8px 10px', borderRadius: '6px', fontSize: '0.84rem' }}
+                  />
                 </div>
               </div>
 
-              {/* Submit Buttons */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setShowModal(false)} className="btn-surface">
-                  Cancel
-                </button>
-                <button type="submit" className="btn-terracotta">
-                  <CheckCircle2 size={16} /> Publish Listing
-                </button>
-              </div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="btn-terracotta"
+                style={{ width: '100%', padding: '10px', fontSize: '0.9rem', marginTop: '6px', justifyContent: 'center' }}
+              >
+                🚀 Publish Instantly to Dhaka Ecosystem
+              </button>
             </form>
           </div>
         </div>

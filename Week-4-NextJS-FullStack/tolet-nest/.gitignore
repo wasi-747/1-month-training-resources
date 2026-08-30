@@ -4,3 +4,8 @@ out
 .env*.local
 .DS_Store
 *.log
+
+.vercel
+.expo/
+*.apk
+*.aab

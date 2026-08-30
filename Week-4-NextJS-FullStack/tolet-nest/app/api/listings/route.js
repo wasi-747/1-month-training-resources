@@ -41,7 +41,25 @@ export async function GET(request) {
         ];
       }
 
-      const listings = await Listing.find(filter).sort({ createdAt: -1 }).lean();
+      let listings = await Listing.find(filter).sort({ createdAt: -1 }).lean();
+
+      // If MongoDB is connected but collection is completely empty, attempt auto-seed or use mockStore
+      if (listings.length === 0) {
+        try {
+          if (Object.keys(filter).length === 0) {
+            const initialData = mockStore.getListings({});
+            const formatted = initialData.map(({ _id, distanceKm, distanceStr, ...rest }) => rest);
+            await Listing.insertMany(formatted);
+            listings = await Listing.find(filter).sort({ createdAt: -1 }).lean();
+          }
+        } catch (seedErr) {
+          console.warn('Auto-seed warning:', seedErr.message);
+        }
+        if (listings.length === 0) {
+          listings = mockStore.getListings(query);
+        }
+      }
+
       return NextResponse.json({
         success: true,
         source: 'mongodb',
@@ -134,3 +152,35 @@ export async function PATCH(request) {
     );
   }
 }
+
+// DELETE /api/listings - Delete a listing
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: 'Listing ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const conn = await connectToDatabase();
+
+    if (conn && !isUsingFallback()) {
+      await Listing.findByIdAndDelete(id);
+      return NextResponse.json({ success: true, source: 'mongodb', message: 'Listing deleted' });
+    } else {
+      mockStore.deleteListing(id);
+      return NextResponse.json({ success: true, source: 'mockStore', message: 'Listing deleted' });
+    }
+  } catch (error) {
+    console.error('Listings DELETE error:', error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+

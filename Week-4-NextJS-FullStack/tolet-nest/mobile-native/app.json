@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "ToLetNest",
+    "slug": "tolet-nest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.toletnest.app",
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#14120f"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9a225265-6e3c-406b-b441-fa8fb5b11a59"
+      }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ]
+  }
+}
