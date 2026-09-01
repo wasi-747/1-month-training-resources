@@ -806,7 +806,7 @@ export default function MobileAppSimulator({ listings, onRefresh, isNativeMobile
       'listing-1': [
         { id: 1, sender: 'system', text: '🔒 Privacy Shield Active: In-app communication channel. Personal SIM number masked.' },
         { id: 2, sender: 'tenant', text: 'Assalamu Alaikum Uncle, is the master bed room available for September?' },
-        { id: 3, sender: 'landlord', text: 'Walaikum Assalam. Yes Baba, it is available. Are you studying at NSU?' },
+        { id: 3, sender: 'landlord', text: 'Walaikum Assalam. Yes, it is available. Are you studying at NSU?' },
       ],
     });
   }, []);
