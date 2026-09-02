@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "open": "adb shell am start -n com.nativenavapp/.MainActivity",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
